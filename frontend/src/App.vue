@@ -1,11 +1,23 @@
-<script setup></script>
+<script setup>
+  import SideBar from './components/SideBar.vue';
+  import ToDoListCard from './components/ToDoListCard.vue';
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
-</template>
+  <div class="container-fluid">
+    <div class="row min-vh-100">
+      
+      <SideBar class="col-2 bg-info"/>
 
-<style scoped></style>
+
+
+      <main class="col-10">
+        <h1>Hello, this is App.vue</h1>
+
+        <p>This is a To Do List Card from component</p>
+        <ToDoListCard/>
+      </main>
+
+    </div>
+  </div>
+</template>
