@@ -50,7 +50,7 @@
     <DetailledTaskCard 
         v-if="showDetails" 
         @close="showDetails = false" 
-        :tasks="tasks_1"
+        :tasks="tasks"
         :taskName="taskName"
         :taskDescription="taskDescription"
         :roomLocation="roomLocation"
