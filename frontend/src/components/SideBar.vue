@@ -1,9 +1,14 @@
+<script setup>
+    const permissionTaskCreation = true
+    const permissionPresetCreationEdition = true
+</script>
 <template>
     <aside>
         <ul>
             <!-- Will be img later -->
             <li><RouterLink to="/profile">Profile</RouterLink></li>
             <li><RouterLink to="/main">Tasks</RouterLink></li>
+            <li><RouterLink to="/newlist">Create a new To Do List</RouterLink></li>
             <li><RouterLink to="/presets">Presets</RouterLink></li>
 
             <!-- This one should be on the bottom later -->
