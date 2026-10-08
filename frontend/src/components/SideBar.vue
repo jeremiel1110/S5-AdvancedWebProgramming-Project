@@ -2,12 +2,12 @@
     <aside>
         <ul>
             <!-- Will be img later -->
-            <li><a href="#">Profile</a></li>
-            <li><a href="#">Tasks</a></li>
-            <li><a href="#">Presets</a></li>
+            <li><RouterLink to="/profile">Profile</RouterLink></li>
+            <li><RouterLink to="/main">Tasks</RouterLink></li>
+            <li><RouterLink to="/presets">Presets</RouterLink></li>
 
             <!-- This one should be on the bottom later -->
-            <li><a href="#">Information</a></li>
+            <li><RouterLink to="/information">Information</RouterLink></li>
         </ul>
     </aside>
 </template>
