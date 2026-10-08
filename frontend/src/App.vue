@@ -1,7 +1,6 @@
 <script setup>
   import SideBar from './components/SideBar.vue';
-  import ToDoListCard from './components/ToDoListCard.vue';
-  import TryCard from './components/TryCard.vue';
+  import ToDoListCard from './components/ToDoListCard.vue'
 
   const assignPeople = [
           {id: 6, name: "fee"},
@@ -24,10 +23,10 @@
         
         
 
-        <TryCard
+        <ToDoListCard
           taskName = "My try to do a responsibe card"
           taskDescription = "A to do list of tasks"
-          roomLocalisation = "1228"
+          roomLocation = "1228"
           :assignPeople="assignPeople"
         />
 

@@ -1,36 +1,59 @@
 <script setup>
-  import { ref } from 'vue'
-  
-  const taskName = ref("Task n°67")
-  const taskDescription = ref("Follow the tasks to clean the room")
-  const roomLocalisation = ref('Clean room 1228')
-  
-  const tasks = ref([{ title: 'fee', done: false }, { title: 'foo', done: true }])
-  function nbOfTaskDone() {
-    let done = 0
-    for (const task of tasks.value) {
-      if (task.done) {
-        done++
-      }
+    import { ref } from 'vue'
+    import DetailledTaskCard from './DetailledTaskCard.vue'
+
+    defineProps({
+        taskName: String,
+        taskDescription: String,
+        roomLocation: String,
+        assignPeople: Array
+    })
+
+    const showDetails = ref(false)
+    
+    const tasks = ref([
+        { id: 1, title: "Clean mirrors", completed: true },
+        { id: 2, title: "Change sheets", completed: false },
+        { id: 3, title: "Clean Bath", completed: false }
+    ])
+
+    function displayTaskProgression() {
+        const remaining = 0
+        const total = 0
+
+        for (task in tasks) {
+            if (task.completed === false) {
+                remaining++
+            }
+            total++
+        }
+
+        return remaining + "/" + total + " task remaining."
     }
-    return `${done}/${tasks.value.length} task(s) done`
-  }
 </script>
-
 <template>
-  <div class="card">
-    <div class="card-body">
-        <h1 class="card-title">{{ taskName }}</h1>
-        <p class="card-text">{{ taskDescription }}</p>
-        <p class="card-text">{{ roomLocalisation }}</p>
-        <p class="card-text">{{ nbOfTaskDone() }}</p>
+    <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title">{{ taskName }}</h1>
+                    <p class="card-text">{{ taskDescription }}</p>
+                    <p class="card-text">{{ roomLocation }}</p>
+                    <p class="card-text"> Method do display number of task done / total number of tasks in the to do list </p>
 
-        <ul>
-            <li><a href="#">Assigned person 1</a></li>
-            <li><a href="#">Assigned person 2</a></li>
-        </ul>
+                    <ul>
+                        <li v-for="person in assignPeople">{{ person.name }}</li>
+                    </ul>
 
-        <button class="btn btn-primary">Details</button>
-    </div>
-  </div>
+                    <button class="btn btn-primary" @click="showDetails = true">Details</button>
+                </div>
+            </div>
+
+    <DetailledTaskCard 
+        v-if="showDetails" 
+        @close="showDetails = false" 
+        :tasks="tasks_1"
+        :taskName="taskName"
+        :taskDescription="taskDescription"
+        :roomLocation="roomLocation"
+        :assignPeople="assignPeople"
+    />
 </template>

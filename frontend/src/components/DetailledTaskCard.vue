@@ -5,7 +5,7 @@ defineEmits(['close'])
 defineProps({
     taskName: String,
     taskDescription: String,
-    roomLocalisation: String,
+    roomLocation: String,
     assignPeople: Array,
     tasks: Array
 })
@@ -20,7 +20,7 @@ defineProps({
                     <p class="text-muted">{{ taskDescription }}</p>
                 </div>
                 <div class="text-end">
-                    <span class="badge bg-primary p-2 mt-1 me-2">Room {{ roomLocalisation }}</span>
+                    <span class="badge bg-primary p-2 mt-1 me-2">Room {{ roomLocation }}</span>
                     <button class="btn btn-outline-danger" @click="$emit('close')">X</button>
                     <!-- <br> -->
                 </div>
