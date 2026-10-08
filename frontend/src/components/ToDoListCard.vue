@@ -18,17 +18,15 @@
     ])
 
     function displayTaskProgression() {
-        const remaining = 0
-        const total = 0
+        let done = 0
 
-        for (task in tasks) {
-            if (task.completed === false) {
-                remaining++
+        for (const task of tasks.value) {
+            if (task.completed === true) {
+                done++
             }
-            total++
         }
 
-        return remaining + "/" + total + " task remaining."
+        return `${done}/${tasks.value.length} task(s) done.`
     }
 </script>
 <template>
@@ -37,7 +35,7 @@
                     <h1 class="card-title">{{ taskName }}</h1>
                     <p class="card-text">{{ taskDescription }}</p>
                     <p class="card-text">{{ roomLocation }}</p>
-                    <p class="card-text"> Method do display number of task done / total number of tasks in the to do list </p>
+                    <p class="card-text"> {{ displayTaskProgression() }} </p>
 
                     <ul>
                         <li v-for="person in assignPeople">{{ person.name }}</li>
