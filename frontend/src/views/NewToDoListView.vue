@@ -38,11 +38,11 @@
     <div class="container-fluid">
         <div class="row min-vh-100">
         
-        <SideBar class="col-2 bg-info"/>
+        <SideBar class="col-auto bg-info"/>
 
 
 
-        <main class="col-10">
+        <main class="col">
             <h1>Create a new To Do list</h1>
 
             <form @submit.prevent="submitToDoList">

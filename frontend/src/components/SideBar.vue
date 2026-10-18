@@ -1,18 +1,77 @@
 <script setup>
-    const permissionTaskCreation = true
-    const permissionPresetCreationEdition = true
-</script>
-<template>
-    <aside>
-        <ul>
-            <!-- Will be img later -->
-            <li><RouterLink to="/profile">Profile</RouterLink></li>
-            <li><RouterLink to="/main">Tasks</RouterLink></li>
-            <li><RouterLink to="/newtodolist">Create a new To Do List</RouterLink></li>
-            <li><RouterLink to="/presets">Presets</RouterLink></li>
+import { useRoute } from 'vue-router'
+import profileIcon from '../assets/sidebar/profile.png'
+import tasksIcon from '../assets/sidebar/tasks.png'
+import newToDoListIcon from '../assets/sidebar/newtodolist.png'
+import presetsIcon from '../assets/sidebar/presets.png'
+import informationIcon from '../assets/sidebar/information.png'
 
-            <!-- This one should be on the bottom later -->
-            <li><RouterLink to="/information">Information</RouterLink></li>
-        </ul>
-    </aside>
+const route = useRoute()
+
+const permissionTaskCreation = true
+const permissionPresetCreationEdition = true
+</script>
+
+<template>
+  <aside class="d-flex flex-column py-4 min-vh-100 h-100">
+    <div class="d-flex flex-column align-items-center gap-3">
+      <RouterLink to="/profile" class="text-decoration-none" title="Profile">
+        <div class="rounded-circle d-flex justify-content-center align-items-center" :style="{
+          width: '65px',
+          height: '65px',
+          backgroundColor: '#bfbfbf',
+          border: route.path === '/profile' ? '4px solid #0e2841' : '2px solid #000000'
+        }">
+          <img :src="profileIcon" width="34" height="34">
+        </div>
+      </RouterLink>
+
+      <RouterLink to="/main" class="text-decoration-none" title="Tasks">
+        <div class="rounded-circle d-flex justify-content-center align-items-center" :style="{
+          width: '65px',
+          height: '65px',
+          backgroundColor: '#bfbfbf',
+          border: route.path === '/main' ? '4px solid #0e2841' : '2px solid #000000'
+        }">
+          <img :src="tasksIcon" width="34" height="34">
+        </div>
+      </RouterLink>
+
+      <RouterLink v-if="permissionTaskCreation" to="/newtodolist" class="text-decoration-none"
+        title="Create a new To Do List">
+        <div class="rounded-circle d-flex justify-content-center align-items-center" :style="{
+          width: '65px',
+          height: '65px',
+          backgroundColor: '#bfbfbf',
+          border: route.path === '/newtodolist' ? '4px solid #0e2841' : '2px solid #000000'
+        }">
+          <img :src="newToDoListIcon" width="34" height="34">
+        </div>
+      </RouterLink>
+
+      <RouterLink v-if="permissionPresetCreationEdition" to="/presets" class="text-decoration-none" title="Presets">
+        <div class="rounded-circle d-flex justify-content-center align-items-center" :style="{
+          width: '65px',
+          height: '65px',
+          backgroundColor: '#bfbfbf',
+          border: route.path === '/presets' ? '4px solid #0e2841' : '2px solid #000000'
+        }">
+          <img :src="presetsIcon" width="34" height="34">
+        </div>
+      </RouterLink>
+    </div>
+
+    <div class="mt-auto">
+      <RouterLink to="/information" class="text-decoration-none" title="Information">
+        <div class="rounded-circle d-flex justify-content-center align-items-center" :style="{
+          width: '65px',
+          height: '65px',
+          backgroundColor: '#bfbfbf',
+          border: route.path === '/information' ? '4px solid #0e2841' : '2px solid #000000'
+        }">
+          <img :src="informationIcon" width="34" height="34" alt="Information">
+        </div>
+      </RouterLink>
+    </div>
+  </aside>
 </template>
