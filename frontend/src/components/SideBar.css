@@ -1,0 +1,44 @@
+.sidebar {
+  position: relative;
+  width: 89px;
+  padding: 0;
+}
+
+.sidebar-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  padding-left: 12px;
+  padding-right: 12px;
+  overflow: hidden;
+  z-index: 1000;
+  transition: width 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sidebar:hover .sidebar-panel,
+.sidebar:focus-within .sidebar-panel {
+  width: 260px;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.25);
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #000000;
+}
+
+.sidebar-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar:hover .sidebar-label,
+.sidebar:focus-within .sidebar-label {
+  opacity: 1;
+}
