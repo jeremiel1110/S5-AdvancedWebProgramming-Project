@@ -28,12 +28,12 @@ const permissionPresetCreationEdition = true
           <span class="sidebar-label">Profile</span>
         </RouterLink>
 
-        <RouterLink to="/main" class="sidebar-link text-decoration-none" title="Tasks">
+        <RouterLink to="/tasks" class="sidebar-link text-decoration-none" title="Tasks">
           <div class="rounded-circle d-flex justify-content-center align-items-center flex-shrink-0" :style="{
             width: '65px',
             height: '65px',
             backgroundColor: '#bfbfbf',
-            border: route.path === '/main' ? '4px solid #0e2841' : '2px solid #000000'
+            border: route.path === '/tasks' ? '4px solid #0e2841' : '2px solid #000000'
           }">
             <img :src="tasksIcon" width="34" height="34">
           </div>

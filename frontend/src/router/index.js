@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import { auth } from "../stores/auth.js";
 import AppLayout from "../layouts/AppLayout.vue";
 import LoginView from "../views/LoginView.vue";
-import MainView from "../views/MainView.vue";
+import TasksView from "../views/TasksView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import NewToDoListView from "../views/NewToDoListView.vue";
 import PresetsView from "../views/PresetsView.vue";
@@ -17,7 +17,7 @@ const router = createRouter({
       path: "/",
       component: AppLayout,
       children: [
-        { path: "main", component: MainView },
+        { path: "tasks", component: TasksView },
         { path: "profile", component: ProfileView },
         { path: "newtodolist", component: NewToDoListView },
         { path: "presets", component: PresetsView },
@@ -31,7 +31,7 @@ router.beforeEach((to) => {
     return "/login";
   }
   if (to.path === "/login" && auth.user) {
-    return "/main";
+    return "/tasks";
   }
 });
 export default router;

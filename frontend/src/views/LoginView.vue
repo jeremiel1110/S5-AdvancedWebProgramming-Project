@@ -13,7 +13,7 @@ const error = ref("");
 
 function connect() {
   if (login(email.value, password.value)) {
-    router.push("/main");
+    router.push("/tasks");
   } else {
     error.value = "Wrong email or password";
   }
