@@ -1,18 +1,3 @@
-<script setup>
-    import SideBar from '../components/SideBar.vue'
-</script>
 <template>
-    <div class="container-fluid">
-        <div class="row min-vh-100">
-        
-        <SideBar class="col-auto bg-info"/>
-
-
-
-        <main class="col">
-            <h1>Profile</h1>
-        </main>
-
-        </div>
-    </div>
+    <h1>Profile</h1>
 </template>
