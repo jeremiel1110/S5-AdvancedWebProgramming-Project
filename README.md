@@ -14,8 +14,6 @@ A course project for managing hotel tasks and assigning to-do lists to staff mem
 - **Milestone 2:** Vue frontend, including navigation, task views, list creation and a demonstration login.
 - **Milestone 3:** Connect the frontend to the backend and database and implement secure authentication with tokens.
 
-The frontend currently uses sample data. The login and list-creation flows are not yet connected to a server.
-
 ## Run the frontend
 
 ```bash
