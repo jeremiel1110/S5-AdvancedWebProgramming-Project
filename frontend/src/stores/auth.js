@@ -17,6 +17,15 @@ const users = [
     lastName: "Smith",
     role: "staff",
   },
+  // Temporary demo account, displayed on the login page
+  {
+    id: 3,
+    email: "demo",
+    password: "password",
+    firstName: "Demo",
+    lastName: "User",
+    role: "manager",
+  },
 ];
 
 export const auth = reactive({

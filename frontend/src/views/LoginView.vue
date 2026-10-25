@@ -25,7 +25,7 @@ function connect() {
     <form class="col-lg-4 text-center" @submit.prevent="connect">
       <div class="mb-3">
         <input
-          type="email"
+          type="text"
           class="form-control text-center rounded-pill bg-light border-dark"
           placeholder="Email"
           v-model="email"
@@ -58,6 +58,12 @@ function connect() {
         >
           Connect
         </button>
+      </div>
+
+      <div class="alert alert-light border border-dark mt-4 mb-0 py-2">
+        <div class="fw-bold">Demo account</div>
+        <div>Email: <code>demo</code></div>
+        <div>Password: <code>password</code></div>
       </div>
     </form>
   </div>
