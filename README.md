@@ -20,6 +20,7 @@ A course project for managing hotel tasks and assigning to-do lists to staff mem
 cd frontend
 npm install
 npm run dev
+```
 
 ## Run the Server
 
@@ -29,5 +30,8 @@ Modifier le fichier db.config.js :
 - Remplacer le : USER: 'root' -> USER: 'Votre Nom Utilisateur'
 - Remplacer le : PASSWORD: '1939', -> PASSWORD: 'Votre Mot de Passe',
 Ouvrir un terminal dans le dossier server puis ecrire :
-- npm install
-- npm start
+
+```bash
+npm install
+npm start
+```

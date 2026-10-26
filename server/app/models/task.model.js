@@ -9,7 +9,8 @@ module.exports = (connex, Sequelize) => {
         task_description: { type: Sequelize.TEXT },
         task_done: { type: Sequelize.BOOLEAN, defaultValue: false },
         to_do_id: { type: Sequelize.INTEGER, allowNull: false }
-    }, { 
+    },
+    { 
         freezeTableName: true, 
         timestamps: false 
     });
