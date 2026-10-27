@@ -8,6 +8,14 @@ A course project for managing hotel tasks and assigning to-do lists to staff mem
 - Planned backend: Node.js
 - Database: MySQL
 
+## Live preview
+
+https://jeremiel1110.github.io/S5-AdvancedWebProgramming-Project/
+
+The preview is deployed automatically from `main` with GitHub Actions. GitHub Pages only serves static files, so only the Vue frontend is online: the Node.js server and the MySQL database are not hosted. As a result, the pages that load or save data (**Tasks** and **New To Do List**) show an error in the preview, while the login, the navigation and the **Information** page work. To try the full application, run the server and the frontend locally (see below).
+
+Demo login: `manager@hotel.com` / `password123`.
+
 ## Project milestones
 
 - **Milestone 1:** Project plan, database design, and initial UI mockups.
