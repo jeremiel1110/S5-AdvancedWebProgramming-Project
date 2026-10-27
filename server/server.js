@@ -4,7 +4,6 @@ const cors = require('cors');
 
 const app = express();
 
-// Autoriser le frontend Vue (qui tourne sur le port 5173 avec Vite) à communiquer avec l'API
 const corsOption = {
     origin: 'http://localhost:5173',
     credentials: true,
@@ -27,7 +26,6 @@ app.get('/', (req, res) => {
 // Importation des routes
 require('./app/routes/todo.route')(app);
 require('./app/routes/task.route')(app);
-// Axel pourra rajouter sa route require('./app/routes/user.route')(app) ici plus tard
 
 // Lancer le serveur
 const PORT = 8080;
