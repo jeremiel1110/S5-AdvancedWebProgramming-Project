@@ -26,6 +26,7 @@ app.get('/', (req, res) => {
 // Importation des routes
 require('./app/routes/todo.route')(app);
 require('./app/routes/task.route')(app);
+require('./app/routes/user.route')(app);
 
 // Lancer le serveur
 const PORT = 8080;

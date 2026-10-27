@@ -1,5 +1,5 @@
 <script setup>
-    import { ref } from 'vue'
+    import { ref, computed, onMounted } from 'vue'
     import { useRouter } from 'vue-router'
     import { auth } from '../stores/auth.js'
     import NewTask from '../components/NewTask.vue'
@@ -7,21 +7,46 @@
     const router = useRouter()
 
     const listName = ref('')
-    const tempPerson = ref('')
-    const assignedPeopleList = ref([])
+    const description = ref('')
+    const users = ref([])
+    const selectedUserId = ref('')
+    const assignedUsers = ref([])
     const room = ref('')
     const taskList = ref([])
     const errorMessage = ref('')
     const isSubmitting = ref(false)
 
-    // Temp function before having the DB and a real ~search system for adding people
-    function addPerson() {
-        const name = tempPerson.value.trim()
-        
-        if (name != '' && !assignedPeopleList.value.includes(name)) {
-            assignedPeopleList.value.push(name)
-            tempPerson.value = ''
+    // Users that can still be assigned (the ones already added are hidden from the select)
+    const availableUsers = computed(() =>
+        users.value.filter(u => !assignedUsers.value.some(a => a.user_id === u.user_id))
+    )
+
+    async function fetchUsers() {
+        try {
+            const response = await fetch('http://localhost:8080/api/user')
+            if (!response.ok) {
+                throw new Error(`Erreur serveur (${response.status})`)
+            }
+            users.value = await response.json()
+        } catch (err) {
+            console.error('Failed to fetch users:', err)
+            errorMessage.value = 'Impossible de charger la liste des utilisateurs.'
         }
+    }
+
+    onMounted(fetchUsers)
+
+    function addPerson() {
+        const user = users.value.find(u => u.user_id === selectedUserId.value)
+
+        if (user) {
+            assignedUsers.value.push(user)
+            selectedUserId.value = ''
+        }
+    }
+
+    function removePerson(userId) {
+        assignedUsers.value = assignedUsers.value.filter(u => u.user_id !== userId)
     }
 
     let nextTaskId = 0
@@ -55,8 +80,9 @@
         const payload = {
             to_do_title: listName.value.trim(),
             to_do_location: room.value ? room.value.trim() : '',
-            to_do_description: '',
+            to_do_description: description.value.trim(),
             user_id: auth.user?.id || 1,
+            assignedUserIds: assignedUsers.value.map(u => u.user_id),
             tasks: validTasks
         }
 
@@ -97,14 +123,24 @@
         </div>
 
         <div class="mb-3">
-            <!-- To Change with like a search that can show people name -->
+            <label for="listDescription" class="form-label fw-bold">Description</label>
+            <textarea id="listDescription" class="form-control bg-light border-dark" rows="2" v-model="description"></textarea>
+        </div>
+
+        <div class="mb-3">
             <label for="personName" class="form-label fw-bold">Assign Person(s)</label>
             <div class="input-group">
-                <input id="personName" type="text" class="form-control bg-light border-dark" v-model="tempPerson">
+                <select id="personName" class="form-select bg-light border-dark" v-model="selectedUserId">
+                    <option value="" disabled>Select a person</option>
+                    <option v-for="user in availableUsers" :key="user.user_id" :value="user.user_id">
+                        {{ user.user_firstname }} {{ user.user_lastname }} ({{ user.role }})
+                    </option>
+                </select>
                 <button
                     type="button"
                     class="btn border-dark text-white fw-bold"
                     style="background-color: #83cbeb"
+                    :disabled="selectedUserId === ''"
                     @click="addPerson"
                 >
                     Add person
@@ -113,11 +149,18 @@
 
             <div class="d-flex flex-wrap gap-2 mt-2">
                 <span
-                    v-for="person in assignedPeopleList"
-                    :key="person"
+                    v-for="person in assignedUsers"
+                    :key="person.user_id"
                     class="badge rounded-pill text-bg-secondary fs-6"
                 >
-                    {{ person }}
+                    {{ person.user_firstname }} {{ person.user_lastname }}
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white ms-1"
+                        style="font-size: 0.6rem"
+                        :aria-label="`Remove ${person.user_firstname} ${person.user_lastname}`"
+                        @click="removePerson(person.user_id)"
+                    ></button>
                 </span>
             </div>
         </div>
