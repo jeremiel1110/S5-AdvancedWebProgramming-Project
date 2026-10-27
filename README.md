@@ -33,6 +33,7 @@ Modifier le fichier db.config.js :
 Ouvrir un terminal dans le dossier server puis ecrire :
 
 ```bash
+cd server
 npm install
 npm start
 ```
