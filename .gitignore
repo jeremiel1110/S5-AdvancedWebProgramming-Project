@@ -38,3 +38,8 @@ __screenshots__/
 # Vite
 *.timestamp-*-*.mjs
 package-lock.json
+
+# Environment variables (credentials)
+.env
+.env.*
+!.env.example

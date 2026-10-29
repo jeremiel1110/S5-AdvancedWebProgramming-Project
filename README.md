@@ -34,7 +34,7 @@ npm run dev
 
 1. Start a MySQL server.
 2. Run the two files of the `DataBase` folder, in this order: `schema.sql` then `seed.sql`.
-3. Edit `server/app/config/db.config.js` and replace `USER` and `PASSWORD` with your own MySQL username and password (do not commit them).
+3. Copy `server/.env.example` to `server/.env`, then fill in your own MySQL username and password (`DB_USER` and `DB_PASSWORD`). The `.env` file is ignored by Git: never commit it.
 4. Open a terminal and run:
 
 ```bash
