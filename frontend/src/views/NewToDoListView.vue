@@ -25,12 +25,12 @@
         try {
             const response = await fetch('http://localhost:8080/api/user')
             if (!response.ok) {
-                throw new Error(`Erreur serveur (${response.status})`)
+                throw new Error(`Server error (${response.status})`)
             }
             users.value = await response.json()
         } catch (err) {
             console.error('Failed to fetch users:', err)
-            errorMessage.value = 'Impossible de charger la liste des utilisateurs.'
+            errorMessage.value = 'Unable to load the list of users.'
         }
     }
 
@@ -62,7 +62,7 @@
 
     async function submitToDoList() {
         if (!listName.value.trim()) {
-            errorMessage.value = 'Le nom de la liste est obligatoire.'
+            errorMessage.value = 'The name of the list is required.'
             return
         }
 
@@ -97,13 +97,13 @@
 
             if (!response.ok) {
                 const errData = await response.json().catch(() => ({}))
-                throw new Error(errData.message || 'Erreur lors de la création de la To-Do list.')
+                throw new Error(errData.message || 'Error while creating the To Do list.')
             }
 
             router.push('/tasks')
         } catch (err) {
             console.error('Failed to create todo list:', err)
-            errorMessage.value = err.message || 'Erreur de connexion au serveur.'
+            errorMessage.value = err.message || 'Unable to reach the server.'
         } finally {
             isSubmitting.value = false
         }

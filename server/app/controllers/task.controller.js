@@ -10,7 +10,7 @@ exports.findAll = (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message: err.message || 'Erreur lors de la récupération des tâches.'
+                message: err.message || 'Error while retrieving the tasks.'
             });
         });
 };
@@ -23,12 +23,12 @@ exports.findOne = (req, res) => {
             if (data) {
                 res.send(data);
             } else {
-                res.status(404).send({ message: `Tâche avec l'id ${id} introuvable.` });
+                res.status(404).send({ message: `Task with id ${id} not found.` });
             }
         })
         .catch(err => {
             res.status(500).send({
-                message: err.message || `Erreur lors de la récupération de la tâche ${id}.`
+                message: err.message || `Error while retrieving task ${id}.`
             });
         });
 };
@@ -36,7 +36,7 @@ exports.findOne = (req, res) => {
 // Ajouter une tâche à une To-Do List existante
 exports.create = (req, res) => {
     if (!req.body.task_title || !req.body.to_do_id) {
-        res.status(400).send({ message: 'Le titre et l\'ID de la To-Do sont obligatoires.' });
+        res.status(400).send({ message: 'The title and the To Do ID are required.' });
         return;
     }
 
@@ -46,7 +46,7 @@ exports.create = (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message: err.message || 'Erreur lors de la création de la tâche.'
+                message: err.message || 'Error while creating the task.'
             });
         });
 };
@@ -60,14 +60,14 @@ exports.update = (req, res) => {
     })
     .then(num => {
         if (num == 1) {
-            res.send({ message: 'Tâche mise à jour avec succès.' });
+            res.send({ message: 'Task updated successfully.' });
         } else {
-            res.send({ message: 'Impossible de trouver la tâche spécifiée.' });
+            res.send({ message: 'Unable to find the specified task.' });
         }
     })
     .catch(err => {
         res.status(500).send({
-            message: err.message || 'Erreur lors de la mise à jour de la tâche.'
+            message: err.message || 'Error while updating the task.'
         });
     });
 };

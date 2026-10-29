@@ -23,7 +23,7 @@
 
     function displayTaskProgression() {
         if (!props.tasks || props.tasks.length === 0) {
-            return '0 tache dans cette liste'
+            return '0 tasks in this list'
         }
 
         let done = 0
@@ -33,7 +33,7 @@
             }
         }
 
-        return `${done}/${props.tasks.length} tache(s) faite(s)`
+        return `${done}/${props.tasks.length} task(s) done`
     }
 
     async function toggleTaskDirect(task) {
@@ -52,7 +52,7 @@
                 })
                 emit('task-updated')
             } catch (e) {
-                console.error('Erreur mise a jour tache:', e)
+                console.error('Failed to update task:', e)
             }
         }
     }
@@ -63,7 +63,7 @@
         <div class="card-body d-flex flex-column">
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <h4 class="card-title mb-0">{{ taskName }}</h4>
-                <span v-if="roomLocation" class="badge bg-primary fs-6">Chambre {{ roomLocation }}</span>
+                <span v-if="roomLocation" class="badge bg-primary fs-6">Room {{ roomLocation }}</span>
             </div>
 
             <p v-if="taskDescription" class="card-text text-muted mb-2">{{ taskDescription }}</p>
@@ -74,11 +74,11 @@
                 </span>
             </div>
 
-            <!-- Liste des tâches directement visible sur la carte -->
+            <!-- Tasks directly visible on the card -->
             <div class="my-2">
-                <div class="small fw-bold text-muted mb-2">Taches associees :</div>
+                <div class="small fw-bold text-muted mb-2">Tasks:</div>
                 <div v-if="!tasks || tasks.length === 0" class="small text-muted fst-italic">
-                    Aucune tache pour le moment.
+                    No tasks yet.
                 </div>
                 <ul v-else class="list-group list-group-flush border rounded-2 mb-2">
                     <li 
@@ -103,14 +103,14 @@
                             </label>
                         </div>
                         <span class="badge" :class="(task.task_done || task.completed) ? 'bg-success' : 'bg-secondary'" style="font-size: 0.7rem;">
-                            {{ (task.task_done || task.completed) ? 'Fait' : 'A faire' }}
+                            {{ (task.task_done || task.completed) ? 'Done' : 'Pending' }}
                         </span>
                     </li>
                 </ul>
             </div>
 
             <div v-if="assignPeople && assignPeople.length > 0" class="mt-auto mb-3">
-                <div class="small fw-bold text-muted mb-1">Personnel assigne :</div>
+                <div class="small fw-bold text-muted mb-1">Assigned people:</div>
                 <div class="d-flex flex-wrap gap-1">
                     <span 
                         v-for="person in assignPeople" 
@@ -127,7 +127,7 @@
                 style="background-color: #83cbeb"
                 @click="showDetails = true"
             >
-                Details et gestion
+                Details and management
             </button>
         </div>
     </div>

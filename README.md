@@ -5,7 +5,7 @@ A course project for managing hotel tasks and assigning to-do lists to staff mem
 ## Technologies
 
 - Frontend: Vue.js, Vue Router, Bootstrap & Vite
-- Planned backend: Node.js
+- Backend: Node.js, Express & Sequelize
 - Database: MySQL
 
 ## Live preview
@@ -32,16 +32,15 @@ npm run dev
 
 ## Run the Server
 
-Creer un serveur sur MySQL et le Run
-Executer les 2 fichiers dans DataBase : schema.sql et seed.sql
-Modifier le fichier db.config.js :
-- Remplacer le : USER: 'root' -> USER: 'Votre Nom Utilisateur'
-- Remplacer le : PASSWORD: '1939', -> PASSWORD: 'Votre Mot de Passe' 
-
-Ouvrir un terminal dans le dossier server puis ecrire :
+1. Start a MySQL server.
+2. Run the two files of the `DataBase` folder, in this order: `schema.sql` then `seed.sql`.
+3. Edit `server/app/config/db.config.js` and replace `USER` and `PASSWORD` with your own MySQL username and password (do not commit them).
+4. Open a terminal and run:
 
 ```bash
 cd server
 npm install
 npm start
 ```
+
+The server listens on port 8080.

@@ -76,14 +76,14 @@ async function addNewTask() {
                     <p class="text-muted mb-0">{{ taskDescription }}</p>
                 </div>
                 <div class="text-end">
-                    <span v-if="roomLocation" class="badge bg-primary p-2 me-2">Chambre {{ roomLocation }}</span>
-                    <button type="button" class="btn-close" aria-label="Fermer" @click="$emit('close')"></button>
+                    <span v-if="roomLocation" class="badge bg-primary p-2 me-2">Room {{ roomLocation }}</span>
+                    <button type="button" class="btn-close" aria-label="Close" @click="$emit('close')"></button>
                 </div>
             </div>
             
             <div class="card-body">
                 <div v-if="assignPeople && assignPeople.length > 0" class="mb-3">
-                    <h6>Assigned people :</h6>
+                    <h6>Assigned people:</h6>
                     <div class="d-flex flex-wrap gap-2">
                         <span v-for="person in assignPeople" :key="person.user_id || person.id || person" class="badge bg-secondary">
                             {{ person.user_firstname ? `${person.user_firstname} ${person.user_lastname}` : (person.name || person) }}
@@ -91,7 +91,7 @@ async function addNewTask() {
                     </div>
                 </div>
 
-                <h6>Tasks :</h6>
+                <h6>Tasks:</h6>
                 <div v-if="!tasks || tasks.length === 0" class="text-muted mb-3">
                     No tasks in this list yet.
                 </div>

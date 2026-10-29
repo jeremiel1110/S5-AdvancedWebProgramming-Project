@@ -4,7 +4,7 @@ const ToDo = db.todos;
 // Créer une nouvelle To-Do List (avec éventuellement des tâches et des utilisateurs assignés)
 exports.create = async (req, res) => {
     if (!req.body.to_do_title) {
-        res.status(400).send({ message: 'Le titre de la To-Do est obligatoire.' });
+        res.status(400).send({ message: 'The title of the To Do is required.' });
         return;
     }
     
@@ -30,7 +30,7 @@ exports.create = async (req, res) => {
         res.send(fullToDo || data);
     } catch (err) {
         res.status(500).send({
-            message: err.message || 'Une erreur est survenue lors de la création de la To-Do.'
+            message: err.message || 'An error occurred while creating the To Do.'
         });
     }
 };
@@ -45,7 +45,7 @@ exports.findAll = (req, res) => {
     })
     .catch(err => {
         res.status(500).send({
-            message: err.message || 'Une erreur est survenue lors de la récupération des données.'
+            message: err.message || 'An error occurred while retrieving the data.'
         });
     });
 };
@@ -58,14 +58,14 @@ exports.delete = (req, res) => {
     })
     .then(num => {
         if (num == 1) {
-            res.send({ message: 'To-Do supprimée avec succès.' });
+            res.send({ message: 'To Do deleted successfully.' });
         } else {
-            res.send({ message: 'Impossible de trouver la To-Do spécifiée.' });
+            res.send({ message: 'Unable to find the specified To Do.' });
         }
     })
     .catch(err => {
         res.status(500).send({
-            message: err.message || 'Erreur lors de la suppression.'
+            message: err.message || 'Error while deleting.'
         });
     });
 };

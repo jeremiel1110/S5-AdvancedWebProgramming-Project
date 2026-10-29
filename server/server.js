@@ -20,7 +20,7 @@ db.connex.sync();
 
 // Route de test simple
 app.get('/', (req, res) => {
-    res.json({ message: 'Bienvenue sur l\'API Hotel To-Do !' });
+    res.json({ message: 'Welcome to the Hotel To-Do API!' });
 });
 
 // Importation des routes
@@ -31,5 +31,5 @@ require('./app/routes/user.route')(app);
 // Lancer le serveur
 const PORT = 8080;
 app.listen(PORT, () => {
-    console.log(`Le serveur tourne sur le port ${PORT}.`);
+    console.log(`Server is running on port ${PORT}.`);
 });
