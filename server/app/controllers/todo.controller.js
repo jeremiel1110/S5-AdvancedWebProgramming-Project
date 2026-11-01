@@ -1,5 +1,11 @@
 const db = require('../models');
 const ToDo = db.todos;
+const userAttributes = ['user_id', 'user_firstname', 'user_lastname', 'role'];
+const todoIncludes = [
+    'tasks',
+    { association: 'owner', attributes: userAttributes },
+    { association: 'assignedUsers', attributes: userAttributes }
+];
 
 // Créer une nouvelle To-Do List (avec éventuellement des tâches et des utilisateurs assignés)
 exports.create = async (req, res) => {
@@ -9,23 +15,14 @@ exports.create = async (req, res) => {
     }
     
     try {
-        let userId = req.body.user_id;
-        if (!userId) {
-            userId = 1;
-        } else {
-            const userExists = await db.users.findByPk(userId);
-            if (!userExists) {
-                userId = 1;
-            }
-        }
-        req.body.user_id = userId;
+        req.body.user_id = req.user.id;
 
         const data = await ToDo.create(req.body, { include: ['tasks'] });
         if (req.body.assignedUserIds && Array.isArray(req.body.assignedUserIds) && req.body.assignedUserIds.length > 0) {
             await data.setAssignedUsers(req.body.assignedUserIds);
         }
         const fullToDo = await ToDo.findByPk(data.to_do_id, {
-            include: ['tasks', 'owner', 'assignedUsers']
+            include: todoIncludes
         });
         res.send(fullToDo || data);
     } catch (err) {
@@ -38,7 +35,7 @@ exports.create = async (req, res) => {
 // Récupérer toutes les To-Do Lists avec leurs tâches et utilisateurs assignés
 exports.findAll = (req, res) => {
     ToDo.findAll({ 
-        include: ['tasks', 'owner', 'assignedUsers'] 
+        include: todoIncludes
     })
     .then(data => {
         res.send(data);

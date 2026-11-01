@@ -1,5 +1,6 @@
 <script setup>
     import { ref } from 'vue'
+    import { apiFetch } from '../stores/auth.js'
     import DetailledTaskCard from './DetailledTaskCard.vue'
 
     const emit = defineEmits(['task-updated'])
@@ -45,11 +46,12 @@
         const taskId = task.task_id || task.id
         if (taskId) {
             try {
-                await fetch(`http://localhost:8080/api/task/${taskId}`, {
+                const response = await apiFetch(`http://localhost:8080/api/task/${taskId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ task_done: newStatus })
                 })
+                if (!response.ok) throw new Error(`Server error (${response.status})`)
                 emit('task-updated')
             } catch (e) {
                 console.error('Failed to update task:', e)

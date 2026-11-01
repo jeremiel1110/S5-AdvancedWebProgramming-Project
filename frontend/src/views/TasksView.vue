@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { apiFetch } from '../stores/auth.js'
 import ToDoListCard from '../components/ToDoListCard.vue'
 
 const todos = ref([])
@@ -10,7 +11,7 @@ async function fetchTodos() {
     isLoading.value = true
     errorMessage.value = ''
     try {
-        const response = await fetch('http://localhost:8080/api/todo')
+        const response = await apiFetch('http://localhost:8080/api/todo')
         if (!response.ok) {
             throw new Error(`Server error (${response.status})`)
         }

@@ -1,7 +1,7 @@
 <script setup>
     import { ref, computed, onMounted } from 'vue'
     import { useRouter } from 'vue-router'
-    import { auth } from '../stores/auth.js'
+    import { apiFetch } from '../stores/auth.js'
     import NewTask from '../components/NewTask.vue'
 
     const router = useRouter()
@@ -23,7 +23,7 @@
 
     async function fetchUsers() {
         try {
-            const response = await fetch('http://localhost:8080/api/user')
+            const response = await apiFetch('http://localhost:8080/api/user')
             if (!response.ok) {
                 throw new Error(`Server error (${response.status})`)
             }
@@ -81,13 +81,12 @@
             to_do_title: listName.value.trim(),
             to_do_location: room.value ? room.value.trim() : '',
             to_do_description: description.value.trim(),
-            user_id: auth.user?.id || 1,
             assignedUserIds: assignedUsers.value.map(u => u.user_id),
             tasks: validTasks
         }
 
         try {
-            const response = await fetch('http://localhost:8080/api/todo', {
+            const response = await apiFetch('http://localhost:8080/api/todo', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

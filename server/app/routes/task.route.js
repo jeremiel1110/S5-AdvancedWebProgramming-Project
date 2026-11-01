@@ -1,6 +1,9 @@
 module.exports = app => {
     const task = require('../controllers/task.controller.js');
     const router = require('express').Router();
+    const verifyToken = require('../middleware/auth');
+
+    router.use(verifyToken);
 
     router.get('/', task.findAll);
     router.get('/:id', task.findOne);

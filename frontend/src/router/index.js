@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { auth } from "../stores/auth.js";
+import { watch } from "vue";
+import { auth, restoreSession } from "../stores/auth.js";
 import AppLayout from "../layouts/AppLayout.vue";
 import LoginView from "../views/LoginView.vue";
 import TasksView from "../views/TasksView.vue";
@@ -26,12 +27,26 @@ const router = createRouter({
     },
   ],
 });
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
+  if (!auth.loaded) {
+    try {
+      await restoreSession();
+    } catch (err) {
+      auth.user = null;
+      auth.loaded = true;
+    }
+  }
   if (to.path !== "/login" && !auth.user) {
     return "/login";
   }
   if (to.path === "/login" && auth.user) {
     return "/tasks";
+  }
+});
+
+watch(() => auth.user, (user) => {
+  if (!user && router.currentRoute.value.path !== "/login") {
+    router.replace("/login");
   }
 });
 export default router;

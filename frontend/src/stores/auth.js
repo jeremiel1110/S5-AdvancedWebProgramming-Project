@@ -1,45 +1,63 @@
 import { reactive } from "vue";
 
-const users = [
-  {
-    id: 1,
-    email: "manager@hotel.com",
-    password: "password123",
-    firstName: "John",
-    lastName: "Doe",
-    role: "manager",
-  },
-  {
-    id: 2,
-    email: "staff@hotel.com",
-    password: "password456",
-    firstName: "Jane",
-    lastName: "Smith",
-    role: "staff",
-  },
-];
+const apiUrl = "http://localhost:8080/api/auth";
+
+localStorage.removeItem("user");
+localStorage.removeItem("token");
 
 export const auth = reactive({
-  user: JSON.parse(localStorage.getItem("user")),
-  token: localStorage.getItem("token"),
+  user: null,
+  loaded: false,
 });
 
-export function login(email, password) {
-  for (const user of users) {
-    if (user.email === email && user.password === password) {
-      auth.user = user;
-      localStorage.setItem("user", JSON.stringify(user));
-      auth.token = "fake-token" + user.id;
-      localStorage.setItem("token", auth.token);
-      return true;
-    }
+export async function login(email, password) {
+  const response = await fetch(apiUrl + "/login", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (response.status === 400 || response.status === 401) {
+    return false;
   }
-  return false;
+  if (!response.ok) {
+    throw new Error("Unable to log in. Please try again.");
+  }
+
+  const data = await response.json();
+  auth.user = data.user;
+  auth.loaded = true;
+  return true;
 }
 
-export function logout() {
+export async function restoreSession() {
+  const response = await fetch(apiUrl + "/me", { credentials: "include" });
+  if (response.ok) {
+    const data = await response.json();
+    auth.user = data.user;
+  } else {
+    auth.user = null;
+  }
+  auth.loaded = true;
+}
+
+export async function logout() {
+  const response = await fetch(apiUrl + "/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+  if (!response.ok) {
+    throw new Error("Unable to log out. Please try again.");
+  }
   auth.user = null;
-  auth.token = null;
-  localStorage.removeItem("user");
-  localStorage.removeItem("token");
+}
+
+export async function apiFetch(url, options = {}) {
+  const response = await fetch(url, { ...options, credentials: "include" });
+  if (response.status === 401) {
+    auth.user = null;
+    throw new Error("Session expired. Please log in again.");
+  }
+  return response;
 }

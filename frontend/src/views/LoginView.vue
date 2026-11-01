@@ -10,12 +10,23 @@ const email = ref("");
 const password = ref("");
 const showPassword = ref(false);
 const error = ref("");
+const isSubmitting = ref(false);
 
-function connect() {
-  if (login(email.value, password.value)) {
-    router.push("/tasks");
-  } else {
-    error.value = "Wrong email or password";
+async function connect() {
+  if (isSubmitting.value) return;
+  error.value = "";
+  isSubmitting.value = true;
+
+  try {
+    if (await login(email.value, password.value)) {
+      router.push("/tasks");
+    } else {
+      error.value = "Wrong email or password";
+    }
+  } catch (err) {
+    error.value = "Unable to log in. Check that the server is running.";
+  } finally {
+    isSubmitting.value = false;
   }
 }
 </script>
@@ -53,6 +64,7 @@ function connect() {
       <div class="mt-3">
         <button
           type="submit"
+          :disabled="isSubmitting"
           class="btn border-3 text-white fs-2 fw-bold rounded-pill w-100"
           style="background-color: #83cbeb; border-color: #215f9a"
         >

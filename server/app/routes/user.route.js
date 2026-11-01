@@ -1,6 +1,9 @@
 module.exports = app => {
     const user = require('../controllers/user.controller.js');
     const router = require('express').Router();
+    const verifyToken = require('../middleware/auth');
+
+    router.use(verifyToken);
 
     router.get('/', user.findAll);
     router.get('/:id', user.findOne);

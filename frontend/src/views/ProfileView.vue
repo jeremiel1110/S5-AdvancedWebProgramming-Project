@@ -1,7 +1,7 @@
 <script setup>
     import { ref, onMounted } from 'vue'
     import { useRouter } from 'vue-router'
-    import { auth, logout } from '../stores/auth'
+    import { auth, logout, apiFetch } from '../stores/auth'
 
     const router = useRouter()
 
@@ -21,7 +21,7 @@
         errorMessage.value = ''
 
         try {
-            const response = await fetch(`http://localhost:8080/api/user/${userId}`)
+            const response = await apiFetch(`http://localhost:8080/api/user/${userId}`)
             if (!response.ok) {
                 throw new Error(`Server error (${response.status})`)
             }
@@ -34,9 +34,13 @@
         }
     }
 
-    function disconnect() {
-        logout()
-        router.push('/login')
+    async function disconnect() {
+        try {
+            await logout()
+            router.push('/login')
+        } catch (err) {
+            errorMessage.value = 'Unable to log out. Check that the server is running.'
+        }
     }
 
     onMounted(() => {

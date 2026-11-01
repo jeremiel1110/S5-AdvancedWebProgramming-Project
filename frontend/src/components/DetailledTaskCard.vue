@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { apiFetch } from '../stores/auth.js'
 
 const emit = defineEmits(['close', 'task-updated'])
 
@@ -29,11 +30,12 @@ async function toggleTask(task) {
     const taskId = task.task_id || task.id
     if (taskId) {
         try {
-            await fetch(`http://localhost:8080/api/task/${taskId}`, {
+            const response = await apiFetch(`http://localhost:8080/api/task/${taskId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ task_done: newStatus })
             })
+            if (!response.ok) throw new Error(`Server error (${response.status})`)
             emit('task-updated')
         } catch (e) {
             console.error('Failed to update task:', e)
@@ -45,7 +47,7 @@ async function addNewTask() {
     if (!newTaskTitle.value.trim() || !props.todoId) return
 
     try {
-        const response = await fetch('http://localhost:8080/api/task', {
+        const response = await apiFetch('http://localhost:8080/api/task', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
