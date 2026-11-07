@@ -6,7 +6,7 @@ defineProps({
     }
 })
 
-defineEmits(['update:title', 'update:description'])
+defineEmits(['update:title', 'update:description', 'remove'])
 </script>
 
 <template>
@@ -32,6 +32,12 @@ defineEmits(['update:title', 'update:description'])
                     :value="task.description"
                     @input="$emit('update:description', $event.target.value)"
                 ></textarea>
+            </div>
+
+            <div class="text-end mt-3">
+                <button type="button" class="btn btn-outline-danger btn-sm" @click="$emit('remove')">
+                    Remove task
+                </button>
             </div>
         </div>
     </div>

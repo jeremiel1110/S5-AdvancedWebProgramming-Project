@@ -17,6 +17,8 @@ db.users = require('./user.model.js')(connex, Sequelize);
 db.todos = require('./todo.model.js')(connex, Sequelize);
 db.tasks = require('./task.model.js')(connex, Sequelize);
 db.user_todos = require('./user_todo.model.js')(connex, Sequelize);
+db.presets = require('./preset.model.js')(connex, Sequelize);
+db.preset_tasks = require('./preset_task.model.js')(connex, Sequelize);
 
 // Définition des relations (Jointures)
 
@@ -39,7 +41,15 @@ db.todos.belongsToMany(db.users, {
     through: db.user_todos, 
     foreignKey: 'to_do_id', 
     otherKey: 'user_id', 
-    as: 'assignedUsers' 
+    as: 'assignedUsers'
 });
+
+// 4. Un preset (modèle de To-Do) contient plusieurs tâches modèles (1:N)
+db.presets.hasMany(db.preset_tasks, { foreignKey: 'preset_id', as: 'tasks', onDelete: 'CASCADE' });
+db.preset_tasks.belongsTo(db.presets, { foreignKey: 'preset_id', as: 'preset' });
+
+// 5. Un utilisateur est le créateur de plusieurs presets (1:N)
+db.users.hasMany(db.presets, { foreignKey: 'user_id', as: 'createdPresets' });
+db.presets.belongsTo(db.users, { foreignKey: 'user_id', as: 'owner' });
 
 module.exports = db;

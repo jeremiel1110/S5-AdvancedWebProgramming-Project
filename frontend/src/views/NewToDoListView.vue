@@ -60,6 +60,10 @@
         })
     }
 
+    function removeTask(taskId) {
+        taskList.value = taskList.value.filter(t => t.id !== taskId)
+    }
+
     async function submitToDoList() {
         if (!listName.value.trim()) {
             errorMessage.value = 'The name of the list is required.'
@@ -177,6 +181,7 @@
             :task="task"
             @update:title="task.title = $event"
             @update:description="task.description = $event"
+            @remove="removeTask(task.id)"
         />
 
         <button type="button" class="btn btn-outline-dark rounded-pill mt-2 mb-4" @click="addTask">

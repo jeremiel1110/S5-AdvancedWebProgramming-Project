@@ -39,6 +39,7 @@ require('./app/routes/todo.route')(app);
 require('./app/routes/task.route')(app);
 require('./app/routes/user.route')(app);
 require('./app/routes/auth.route')(app);
+require('./app/routes/preset.route')(app);
 
 // Lancer le serveur
 const PORT = 8080;

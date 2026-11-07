@@ -48,7 +48,32 @@ CREATE TABLE IF NOT EXISTS user_to_do (
     CONSTRAINT fk_utd_user 
         FOREIGN KEY (user_id) REFERENCES user_(user_id) 
         ON DELETE CASCADE,
-    CONSTRAINT fk_utd_todo 
-        FOREIGN KEY (to_do_id) REFERENCES to_do(to_do_id) 
+    CONSTRAINT fk_utd_todo
+        FOREIGN KEY (to_do_id) REFERENCES to_do(to_do_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- 6. Table des presets (modèles de To-Do réutilisables)
+CREATE TABLE IF NOT EXISTS preset (
+    preset_id INT AUTO_INCREMENT,
+    preset_title VARCHAR(255) NOT NULL,
+    preset_description TEXT,
+    user_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (preset_id),
+    CONSTRAINT fk_preset_owner
+        FOREIGN KEY (user_id) REFERENCES user_(user_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- 7. Table des tâches modèles d'un preset
+CREATE TABLE IF NOT EXISTS preset_task (
+    preset_task_id INT AUTO_INCREMENT,
+    preset_task_title VARCHAR(255) NOT NULL,
+    preset_task_description TEXT,
+    preset_id INT NOT NULL,
+    PRIMARY KEY (preset_task_id),
+    CONSTRAINT fk_preset_task_preset
+        FOREIGN KEY (preset_id) REFERENCES preset(preset_id)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
