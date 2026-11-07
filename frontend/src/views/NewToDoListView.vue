@@ -8,6 +8,8 @@
 
     const listName = ref('')
     const description = ref('')
+    const presets = ref([])
+    const selectedPresetId = ref('')
     const users = ref([])
     const selectedUserId = ref('')
     const assignedUsers = ref([])
@@ -34,7 +36,23 @@
         }
     }
 
-    onMounted(fetchUsers)
+    async function fetchPresets() {
+        try {
+            const response = await apiFetch('http://localhost:8080/api/preset')
+            if (!response.ok) {
+                throw new Error(`Server error (${response.status})`)
+            }
+            presets.value = await response.json()
+        } catch (err) {
+            // The form still works without presets, so no error message here
+            console.error('Failed to fetch presets:', err)
+        }
+    }
+
+    onMounted(() => {
+        fetchUsers()
+        fetchPresets()
+    })
 
     function addPerson() {
         const user = users.value.find(u => u.user_id === selectedUserId.value)
@@ -62,6 +80,30 @@
 
     function removeTask(taskId) {
         taskList.value = taskList.value.filter(t => t.id !== taskId)
+    }
+
+    // Fill the name, the description and the tasks of the form with the ones of a preset
+    // (the room and the assigned people are specific to each list, so they are kept as they are)
+    function applyPreset() {
+        const preset = presets.value.find(p => p.preset_id === selectedPresetId.value)
+        if (!preset) {
+            return
+        }
+
+        const formHasData = listName.value.trim() || description.value.trim() || taskList.value.length > 0
+        if (formHasData && !window.confirm('Replace the name, the description and the tasks of the form with the ones of this preset?')) {
+            return
+        }
+
+        listName.value = preset.preset_title
+        description.value = preset.preset_description || ''
+        taskList.value = (preset.tasks || []).map(task => ({
+            id: nextTaskId++,
+            title: task.preset_task_title,
+            description: task.preset_task_description || '',
+            done: false
+        }))
+        selectedPresetId.value = ''
     }
 
     async function submitToDoList() {
@@ -117,6 +159,32 @@
 
     <div v-if="errorMessage" class="col-lg-6 alert alert-danger py-2 mb-3">
         {{ errorMessage }}
+    </div>
+
+    <div class="col-lg-6 card shadow-sm border-dark-subtle mb-4">
+        <div class="card-body">
+            <label for="presetSelect" class="form-label fw-bold">Create from preset</label>
+            <div v-if="presets.length > 0" class="input-group">
+                <select id="presetSelect" class="form-select bg-light border-dark" v-model="selectedPresetId">
+                    <option value="" disabled>Select a preset</option>
+                    <option v-for="preset in presets" :key="preset.preset_id" :value="preset.preset_id">
+                        {{ preset.preset_title }} ({{ preset.tasks.length }} task(s))
+                    </option>
+                </select>
+                <button
+                    type="button"
+                    class="btn border-dark text-white fw-bold"
+                    style="background-color: #83cbeb"
+                    :disabled="selectedPresetId === ''"
+                    @click="applyPreset"
+                >
+                    Use preset
+                </button>
+            </div>
+            <p v-else class="text-muted mb-0">
+                No presets yet. You can create some in the <RouterLink to="/presets">Presets</RouterLink> page.
+            </p>
+        </div>
     </div>
 
     <form class="col-lg-6 pb-5" @submit.prevent="submitToDoList">
