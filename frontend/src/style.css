@@ -1,0 +1,58 @@
+:root {
+    --hotel-green: #173a34;
+    --hotel-green-hover: #245348;
+    --hotel-green-active: #102b26;
+    --hotel-green-soft: #e7f1ec;
+    --hotel-border: #e2e8e4;
+}
+
+.hotel-background {
+    background-color: #f7f8f6;
+}
+
+.hotel-card {
+    border: 1px solid var(--hotel-border);
+    border-radius: 16px;
+    background-color: #fff;
+    box-shadow: 0 4px 16px rgb(23 58 52 / 8%);
+}
+
+.hotel-card > .card-body {
+    padding: 1.25rem;
+}
+
+.hotel-title {
+    color: var(--hotel-green);
+    overflow-wrap: anywhere;
+}
+
+.hotel-badge {
+    padding: 0.45rem 0.65rem;
+    border-radius: 999px;
+    background-color: var(--hotel-green-soft);
+    color: var(--hotel-green);
+}
+
+.btn-hotel {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--hotel-green);
+    --bs-btn-border-color: var(--hotel-green);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--hotel-green-hover);
+    --bs-btn-hover-border-color: var(--hotel-green-hover);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--hotel-green-active);
+    --bs-btn-active-border-color: var(--hotel-green-active);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: var(--hotel-green);
+    --bs-btn-disabled-border-color: var(--hotel-green);
+    --bs-btn-focus-shadow-rgb: 36, 83, 72;
+    --bs-btn-font-weight: 600;
+    --bs-btn-border-radius: 0.625rem;
+}
+
+.hotel-form .form-control:focus,
+.hotel-form .form-select:focus {
+    border-color: var(--hotel-green-hover);
+    box-shadow: 0 0 0 0.2rem rgb(36 83 72 / 20%);
+}

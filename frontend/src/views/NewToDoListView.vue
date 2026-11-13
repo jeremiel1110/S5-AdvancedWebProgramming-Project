@@ -155,117 +155,123 @@
     }
 </script>
 <template>
-    <h1 class="my-4">Create a new To Do list</h1>
+    <div class="container-fluid py-4">
+        <h1 class="h2 hotel-title mb-4">Create a new To Do list</h1>
 
-    <div v-if="errorMessage" class="col-lg-6 alert alert-danger py-2 mb-3">
-        {{ errorMessage }}
-    </div>
-
-    <div class="col-lg-6 card shadow-sm border-dark-subtle mb-4">
-        <div class="card-body">
-            <label for="presetSelect" class="form-label fw-bold">Create from preset</label>
-            <div v-if="presets.length > 0" class="input-group">
-                <select id="presetSelect" class="form-select bg-light border-dark" v-model="selectedPresetId">
-                    <option value="" disabled>Select a preset</option>
-                    <option v-for="preset in presets" :key="preset.preset_id" :value="preset.preset_id">
-                        {{ preset.preset_title }} ({{ preset.tasks.length }} task(s))
-                    </option>
-                </select>
-                <button
-                    type="button"
-                    class="btn border-dark text-white fw-bold"
-                    style="background-color: #83cbeb"
-                    :disabled="selectedPresetId === ''"
-                    @click="applyPreset"
-                >
-                    Use preset
-                </button>
-            </div>
-            <p v-else class="text-muted mb-0">
-                No presets yet. You can create some in the <RouterLink to="/presets">Presets</RouterLink> page.
-            </p>
-        </div>
-    </div>
-
-    <form class="col-lg-6 pb-5" @submit.prevent="submitToDoList">
-        <div class="mb-3">
-            <label for="listName" class="form-label fw-bold">To Do List name</label>
-            <input id="listName" type="text" class="form-control bg-light border-dark" v-model="listName">
+        <div v-if="errorMessage" class="col-lg-8 col-xl-6 alert alert-danger py-2 mb-3">
+            {{ errorMessage }}
         </div>
 
-        <div class="mb-3">
-            <label for="listDescription" class="form-label fw-bold">Description</label>
-            <textarea id="listDescription" class="form-control bg-light border-dark" rows="2" v-model="description"></textarea>
-        </div>
-
-        <div class="mb-3">
-            <label for="personName" class="form-label fw-bold">Assign Person(s)</label>
-            <div class="input-group">
-                <select id="personName" class="form-select bg-light border-dark" v-model="selectedUserId">
-                    <option value="" disabled>Select a person</option>
-                    <option v-for="user in availableUsers" :key="user.user_id" :value="user.user_id">
-                        {{ user.user_firstname }} {{ user.user_lastname }} ({{ user.role }})
-                    </option>
-                </select>
-                <button
-                    type="button"
-                    class="btn border-dark text-white fw-bold"
-                    style="background-color: #83cbeb"
-                    :disabled="selectedUserId === ''"
-                    @click="addPerson"
-                >
-                    Add person
-                </button>
-            </div>
-
-            <div class="d-flex flex-wrap gap-2 mt-2">
-                <span
-                    v-for="person in assignedUsers"
-                    :key="person.user_id"
-                    class="badge rounded-pill text-bg-secondary fs-6"
-                >
-                    {{ person.user_firstname }} {{ person.user_lastname }}
+        <div class="card hotel-card hotel-form col-lg-8 col-xl-6 mb-4">
+            <div class="card-body">
+                <label for="presetSelect" class="form-label fw-bold">Create from preset</label>
+                <div v-if="presets.length > 0" class="input-group">
+                    <select id="presetSelect" class="form-select" v-model="selectedPresetId">
+                        <option value="" disabled>Select a preset</option>
+                        <option v-for="preset in presets" :key="preset.preset_id" :value="preset.preset_id">
+                            {{ preset.preset_title }} ({{ preset.tasks.length }} task(s))
+                        </option>
+                    </select>
                     <button
                         type="button"
-                        class="btn-close btn-close-white ms-1"
-                        style="font-size: 0.6rem"
-                        :aria-label="`Remove ${person.user_firstname} ${person.user_lastname}`"
-                        @click="removePerson(person.user_id)"
-                    ></button>
-                </span>
+                        class="btn btn-outline-secondary"
+                        :disabled="selectedPresetId === ''"
+                        @click="applyPreset"
+                    >
+                        Use preset
+                    </button>
+                </div>
+                <p v-else class="text-muted mb-0">
+                    No presets yet. You can create some in the <RouterLink to="/presets">Presets</RouterLink> page.
+                </p>
             </div>
         </div>
 
-        <div class="mb-4">
-            <label for="room" class="form-label fw-bold">Room Location</label>
-            <input id="room" type="text" class="form-control bg-light border-dark" v-model="room">
-        </div>
+        <form class="hotel-form col-lg-8 col-xl-6" @submit.prevent="submitToDoList">
+            <section class="hotel-card p-3 p-sm-4 mb-3">
+                <h2 class="h5 hotel-title mb-3">List details</h2>
+                <div class="mb-3">
+                    <label for="listName" class="form-label fw-bold">To Do List name</label>
+                    <input id="listName" type="text" class="form-control" v-model="listName">
+                </div>
 
-        <h2 class="fs-4">Tasks</h2>
+                <div class="mb-3">
+                    <label for="listDescription" class="form-label fw-bold">Description</label>
+                    <textarea id="listDescription" class="form-control" rows="2" v-model="description"></textarea>
+                </div>
 
-        <NewTask
-            v-for="task in taskList"
-            :key="task.id"
-            :task="task"
-            @update:title="task.title = $event"
-            @update:description="task.description = $event"
-            @remove="removeTask(task.id)"
-        />
+                <div class="mb-0">
+                    <label for="room" class="form-label fw-bold">Room Location</label>
+                    <input id="room" type="text" class="form-control" v-model="room">
+                </div>
+            </section>
 
-        <button type="button" class="btn btn-outline-dark rounded-pill mt-2 mb-4" @click="addTask">
-            + Add a task
-        </button>
+            <section class="hotel-card p-3 p-sm-4 mb-3">
+                <h2 class="h5 hotel-title mb-3">Assigned people</h2>
+                <div>
+                    <label for="personName" class="form-label fw-bold">Assign Person(s)</label>
+                    <div class="input-group">
+                        <select id="personName" class="form-select" v-model="selectedUserId">
+                            <option value="" disabled>Select a person</option>
+                            <option v-for="user in availableUsers" :key="user.user_id" :value="user.user_id">
+                                {{ user.user_firstname }} {{ user.user_lastname }} ({{ user.role }})
+                            </option>
+                        </select>
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            :disabled="selectedUserId === ''"
+                            @click="addPerson"
+                        >
+                            Add person
+                        </button>
+                    </div>
 
-        <div class="mt-4">
-            <button
-                type="submit"
-                class="btn border-3 text-white fs-4 fw-bold rounded-pill w-100"
-                style="background-color: #83cbeb; border-color: #215f9a"
-                :disabled="isSubmitting"
-            >
-                <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
-                {{ isSubmitting ? 'Creation in progress...' : 'Create To Do List' }}
-            </button>
-        </div>
-    </form>
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        <span
+                            v-for="person in assignedUsers"
+                            :key="person.user_id"
+                            class="badge hotel-badge d-inline-flex align-items-center gap-1"
+                        >
+                            {{ person.user_firstname }} {{ person.user_lastname }}
+                            <button
+                                type="button"
+                                class="btn-close ms-1"
+                                style="font-size: 0.6rem"
+                                :aria-label="`Remove ${person.user_firstname} ${person.user_lastname}`"
+                                @click="removePerson(person.user_id)"
+                            ></button>
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="hotel-card p-3 p-sm-4 mb-3">
+                <h2 class="h5 hotel-title mb-3">Tasks</h2>
+                <NewTask
+                    v-for="task in taskList"
+                    :key="task.id"
+                    :task="task"
+                    @update:title="task.title = $event"
+                    @update:description="task.description = $event"
+                    @remove="removeTask(task.id)"
+                />
+
+                <button type="button" class="btn btn-outline-secondary mt-2" @click="addTask">
+                    + Add a task
+                </button>
+            </section>
+
+            <div class="mt-4">
+                <button
+                    type="submit"
+                    class="btn btn-hotel w-100"
+                    :disabled="isSubmitting"
+                >
+                    <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                    {{ isSubmitting ? 'Creation in progress...' : 'Create To Do List' }}
+                </button>
+            </div>
+        </form>
+    </div>
 </template>

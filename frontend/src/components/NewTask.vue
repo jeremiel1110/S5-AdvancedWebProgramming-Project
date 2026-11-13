@@ -17,7 +17,7 @@ defineEmits(['update:title', 'update:description', 'remove'])
                 <input
                     :id="`task-title-${task.id}`"
                     type="text"
-                    class="form-control bg-light border-dark"
+                    class="form-control"
                     :value="task.title"
                     @input="$emit('update:title', $event.target.value)"
                 >
@@ -27,7 +27,7 @@ defineEmits(['update:title', 'update:description', 'remove'])
                 <label :for="`task-description-${task.id}`" class="form-label fw-bold">Task description</label>
                 <textarea
                     :id="`task-description-${task.id}`"
-                    class="form-control bg-light border-dark"
+                    class="form-control"
                     rows="3"
                     :value="task.description"
                     @input="$emit('update:description', $event.target.value)"

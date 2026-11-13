@@ -49,7 +49,7 @@
 </script>
 <template>
     <div class="container-fluid py-4">
-        <h1 class="h2 mb-4">Profile</h1>
+        <h1 class="h2 hotel-title mb-4">Profile</h1>
 
         <div v-if="isLoading" class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
@@ -62,7 +62,7 @@
             {{ errorMessage }}
         </div>
 
-        <div v-else-if="userProfile" class="card col-lg-6 shadow-sm border-dark-subtle mb-4">
+        <div v-else-if="userProfile" class="card hotel-card col-lg-6 mb-4">
             <div class="card-body">
                 <div class="mb-3">
                     <span class="fw-bold">First name: </span>
@@ -78,11 +78,11 @@
                 </div>
                 <div>
                     <span class="fw-bold">Role: </span>
-                    <span class="badge bg-secondary">{{ userProfile.role }}</span>
+                    <span class="badge hotel-badge">{{ userProfile.role }}</span>
                 </div>
             </div>
         </div>
 
-        <button type="button" class="btn btn-danger" @click="disconnect">Log out</button>
+        <button type="button" class="btn btn-outline-secondary" @click="disconnect">Log out</button>
     </div>
 </template>

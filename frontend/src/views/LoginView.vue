@@ -32,48 +32,50 @@ async function connect() {
 </script>
 
 <template>
-  <div class="min-vh-100 d-flex justify-content-center align-items-center">
-    <form class="col-lg-4 text-center" @submit.prevent="connect">
+  <div class="min-vh-100 d-flex justify-content-center align-items-center hotel-background p-3">
+    <form class="hotel-card hotel-form w-100 p-4" style="max-width: 28rem" @submit.prevent="connect">
+      <h1 class="h3 hotel-title mb-4">Hotel To-Do List</h1>
+
       <div class="mb-3">
+        <label for="login-email" class="form-label fw-semibold">Email</label>
         <input
+          id="login-email"
           type="email"
-          class="form-control text-center rounded-pill bg-light border-dark"
-          placeholder="Email"
+          class="form-control"
+          autocomplete="username"
           v-model="email"
         />
       </div>
 
-      <div class="input-group mb-5">
-        <input
-          :type="showPassword ? 'text' : 'password'"
-          class="form-control text-center rounded-start-pill bg-light border-dark"
-          placeholder="Password"
-          v-model="password"
-        />
-        <button
-          class="btn border-dark rounded-end-pill"
-          type="button"
-          @click="showPassword = !showPassword"
-        >
-          <img :src="eyeIcon" width="22" height="22" />
-        </button>
+      <div class="mb-4">
+        <label for="login-password" class="form-label fw-semibold">Password</label>
+        <div class="input-group">
+          <input
+            id="login-password"
+            :type="showPassword ? 'text' : 'password'"
+            class="form-control"
+            autocomplete="current-password"
+            v-model="password"
+          />
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            :aria-label="showPassword ? 'Hide password' : 'Show password'"
+            @click="showPassword = !showPassword"
+          >
+            <img :src="eyeIcon" alt="" width="22" height="22" />
+          </button>
+        </div>
       </div>
 
       <div v-if="error" class="alert alert-danger py-2">{{ error }}</div>
 
-      <div class="mt-3">
-        <button
-          type="submit"
-          :disabled="isSubmitting"
-          class="btn border-3 text-white fs-2 fw-bold rounded-pill w-100"
-          style="background-color: #83cbeb; border-color: #215f9a"
-        >
-          Connect
-        </button>
-      </div>
+      <button type="submit" :disabled="isSubmitting" class="btn btn-hotel w-100">
+        Connect
+      </button>
 
-      <div class="alert alert-light border border-dark mt-4 mb-0 py-2">
-        <div class="fw-bold">Demo account</div>
+      <div class="bg-body-tertiary border rounded-3 mt-4 p-3 small">
+        <div class="fw-bold hotel-title">Demo account</div>
         <div>Email: <code>manager@hotel.com</code></div>
         <div>Password: <code>password123</code></div>
       </div>

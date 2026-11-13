@@ -1,5 +1,5 @@
 <script setup>
-    import { ref } from 'vue'
+    import { computed, ref } from 'vue'
     import { apiFetch } from '../stores/auth.js'
     import DetailledTaskCard from './DetailledTaskCard.vue'
 
@@ -22,20 +22,10 @@
 
     const showDetails = ref(false)
 
-    function displayTaskProgression() {
-        if (!props.tasks || props.tasks.length === 0) {
-            return '0 tasks in this list'
-        }
-
-        let done = 0
-        for (const task of props.tasks) {
-            if (task.task_done || task.completed) {
-                done++
-            }
-        }
-
-        return `${done}/${props.tasks.length} task(s) done`
-    }
+    const taskCount = computed(() => props.tasks?.length ?? 0)
+    const completedCount = computed(() =>
+        props.tasks?.filter(task => task.task_done || task.completed).length ?? 0
+    )
 
     async function toggleTaskDirect(task) {
         const currentStatus = Boolean(task.task_done || task.completed)
@@ -61,19 +51,27 @@
 </script>
 
 <template>
-    <div class="card h-100 shadow-sm border-dark-subtle">
+    <div class="card h-100 room-card">
         <div class="card-body d-flex flex-column">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-                <h4 class="card-title mb-0">{{ taskName }}</h4>
-                <span v-if="roomLocation" class="badge bg-primary fs-6">Room {{ roomLocation }}</span>
+            <div class="mb-2">
+                <span v-if="roomLocation" class="badge hotel-badge mb-2">
+                    Room {{ roomLocation }}
+                </span>
+                <h4 class="card-title hotel-title mb-0">{{ taskName }}</h4>
             </div>
 
             <p v-if="taskDescription" class="card-text text-muted mb-2">{{ taskDescription }}</p>
 
-            <div class="d-flex justify-content-between align-items-center my-2">
-                <span class="card-text fw-semibold text-secondary small">
-                    {{ displayTaskProgression() }}
+            <div v-if="taskCount > 0" class="my-2">
+                <span class="small fw-semibold text-secondary">
+                    {{ completedCount }} of {{ taskCount }} {{ taskCount === 1 ? 'task' : 'tasks' }} complete
                 </span>
+                <progress
+                    class="room-progress"
+                    :value="completedCount"
+                    :max="taskCount"
+                    aria-label="Task progress"
+                ></progress>
             </div>
 
             <!-- Tasks directly visible on the card -->
@@ -86,27 +84,22 @@
                     <li 
                         v-for="task in tasks" 
                         :key="task.task_id || task.id" 
-                        class="list-group-item d-flex align-items-center justify-content-between py-2 px-3"
+                        class="list-group-item d-flex align-items-center py-2 px-3"
                     >
-                        <div class="d-flex align-items-center flex-grow-1 me-2">
-                            <input 
-                                class="form-check-input me-2 mt-0" 
-                                type="checkbox" 
-                                :id="'card-task-' + (task.task_id || task.id)" 
-                                :checked="Boolean(task.task_done || task.completed)"
-                                @change="toggleTaskDirect(task)"
-                            >
-                            <label 
-                                class="form-check-label small mb-0" 
-                                :for="'card-task-' + (task.task_id || task.id)" 
-                                :class="{'text-decoration-line-through text-muted': task.task_done || task.completed}"
-                            >
-                                {{ task.task_title || task.title }}
-                            </label>
-                        </div>
-                        <span class="badge" :class="(task.task_done || task.completed) ? 'bg-success' : 'bg-secondary'" style="font-size: 0.7rem;">
-                            {{ (task.task_done || task.completed) ? 'Done' : 'Pending' }}
-                        </span>
+                        <input 
+                            class="form-check-input flex-shrink-0 me-2 mt-0" 
+                            type="checkbox" 
+                            :id="'card-task-' + (task.task_id || task.id)" 
+                            :checked="Boolean(task.task_done || task.completed)"
+                            @change="toggleTaskDirect(task)"
+                        >
+                        <label 
+                            class="form-check-label small text-break mb-0" 
+                            :for="'card-task-' + (task.task_id || task.id)" 
+                            :class="{'text-decoration-line-through text-muted': task.task_done || task.completed}"
+                        >
+                            {{ task.task_title || task.title }}
+                        </label>
                     </li>
                 </ul>
             </div>
@@ -124,12 +117,12 @@
                 </div>
             </div>
 
-            <button 
-                class="btn border-dark text-white fw-bold mt-2" 
-                style="background-color: #83cbeb"
+            <button
+                type="button"
+                class="btn btn-hotel mt-2"
                 @click="showDetails = true"
             >
-                Details and management
+                View details
             </button>
         </div>
     </div>
@@ -146,3 +139,44 @@
         :assignPeople="assignPeople"
     />
 </template>
+<style scoped>
+.room-card {
+    border: 1px solid #e2e8e4;
+    border-radius: 16px;
+    background-color: #fff;
+    box-shadow: 0 4px 16px rgb(23 58 52 / 8%);
+}
+
+.room-card .card-body {
+    padding: 1.25rem;
+}
+
+.room-card .card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.room-progress {
+    display: block;
+    width: 100%;
+    height: 0.5rem;
+    margin-top: 0.375rem;
+    appearance: none;
+    border: 0;
+    border-radius: 999px;
+    overflow: hidden;
+    background-color: var(--hotel-green-soft);
+}
+
+.room-progress::-webkit-progress-bar {
+    background-color: var(--hotel-green-soft);
+}
+
+.room-progress::-webkit-progress-value {
+    background-color: var(--hotel-green);
+}
+
+.room-progress::-moz-progress-bar {
+    background-color: var(--hotel-green);
+}
+</style>

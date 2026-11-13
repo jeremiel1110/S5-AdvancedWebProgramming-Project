@@ -32,19 +32,33 @@ onMounted(() => {
 
 <template>
   <div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
       <div>
-        <h1 class="h2 mb-1">Hotel Tasks & To-Do Lists</h1>
-        <p class="text-muted mb-0">Follow the progress of the tasks and the state of the rooms.</p>
+        <h1 class="h2 mb-1">Hotel Tasks &amp; To-Do Lists</h1>
+        <p class="text-muted mb-0">
+          Follow the progress of the tasks and the state of the rooms.
+        </p>
       </div>
-      <button 
-        class="btn btn-outline-secondary btn-sm"
-        @click="fetchTodos" 
-        :disabled="isLoading"
-      >
-        <span v-if="isLoading" class="spinner-border spinner-border-sm me-1"></span>
-        Refresh
-      </button>
+
+      <div class="d-flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          :disabled="isLoading"
+          @click="fetchTodos"
+        >
+          <span
+            v-if="isLoading"
+            class="spinner-border spinner-border-sm me-1"
+            aria-hidden="true"
+          ></span>
+          Refresh
+        </button>
+
+        <RouterLink to="/newtodolist" class="btn btn-hotel">
+          + New list
+        </RouterLink>
+      </div>
     </div>
 
     <!-- Loading State -->
@@ -66,10 +80,7 @@ onMounted(() => {
     <!-- Empty State -->
     <div v-else-if="todos.length === 0" class="text-center py-5 border rounded bg-light">
       <h3 class="h5 text-muted mb-2">No tasks yet</h3>
-      <p class="text-muted mb-3">Create your first To Do list with tasks to get started.</p>
-      <RouterLink to="/newtodolist" class="btn text-white fw-bold" style="background-color: #83cbeb">
-        + Create a To Do List
-      </RouterLink>
+      <p class="text-muted mb-0">Create your first To Do list with tasks to get started.</p>
     </div>
 
     <!-- Cards Grid -->

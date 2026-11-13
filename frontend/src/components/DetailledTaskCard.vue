@@ -71,14 +71,14 @@ async function addNewTask() {
 
 <template>
     <div class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0,0,0,0.5); z-index: 1050;" @click.self="$emit('close')">
-        <div class="card w-75 shadow-lg" style="max-height: 90vh; overflow-y: auto;">
-            <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card hotel-card hotel-form w-100 mx-3" style="max-width: 48rem; max-height: 90vh; overflow-y: auto;">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-start gap-2 p-3">
                 <div>
-                    <h5 class="mb-1">{{ taskName }}</h5>
+                    <h5 class="hotel-title mb-1">{{ taskName }}</h5>
                     <p class="text-muted mb-0">{{ taskDescription }}</p>
                 </div>
                 <div class="text-end">
-                    <span v-if="roomLocation" class="badge bg-primary p-2 me-2">Room {{ roomLocation }}</span>
+                    <span v-if="roomLocation" class="badge hotel-badge me-2">Room {{ roomLocation }}</span>
                     <button type="button" class="btn-close" aria-label="Close" @click="$emit('close')"></button>
                 </div>
             </div>
@@ -134,7 +134,7 @@ async function addNewTask() {
                             placeholder="New task title..."
                             @keyup.enter="addNewTask"
                         >
-                        <button class="btn text-white fw-bold" style="background-color: #83cbeb" type="button" @click="addNewTask">
+                        <button class="btn btn-hotel" type="button" @click="addNewTask">
                             Add
                         </button>
                     </div>

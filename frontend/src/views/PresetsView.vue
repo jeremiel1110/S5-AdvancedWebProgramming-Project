@@ -147,16 +147,15 @@
 </script>
 <template>
     <div class="container-fluid py-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
             <div>
-                <h1 class="h2 mb-1">Presets</h1>
+                <h1 class="h2 hotel-title mb-1">Presets</h1>
                 <p class="text-muted mb-0">Ready-made To Do lists: a name, a description and a list of tasks.</p>
             </div>
             <button
                 v-if="!showForm"
                 type="button"
-                class="btn text-white fw-bold"
-                style="background-color: #83cbeb"
+                class="btn btn-hotel"
                 @click="openCreate"
             >
                 + New preset
@@ -167,9 +166,9 @@
             {{ errorMessage }}
         </div>
 
-        <form v-if="showForm" class="card col-lg-6 shadow-sm border-dark-subtle mb-4" @submit.prevent="savePreset">
+        <form v-if="showForm" class="card hotel-card hotel-form col-lg-8 col-xl-6 mb-4" @submit.prevent="savePreset">
             <div class="card-body">
-                <h2 class="h4 mb-3">{{ editingId !== null ? 'Edit the preset' : 'New preset' }}</h2>
+                <h2 class="h4 hotel-title mb-3">{{ editingId !== null ? 'Edit the preset' : 'New preset' }}</h2>
 
                 <div v-if="formError" class="alert alert-danger py-2" role="alert">
                     {{ formError }}
@@ -177,15 +176,15 @@
 
                 <div class="mb-3">
                     <label for="presetName" class="form-label fw-bold">Preset name</label>
-                    <input id="presetName" type="text" class="form-control bg-light border-dark" v-model="presetName">
+                    <input id="presetName" type="text" class="form-control" v-model="presetName">
                 </div>
 
                 <div class="mb-3">
                     <label for="presetDescription" class="form-label fw-bold">Description</label>
-                    <textarea id="presetDescription" class="form-control bg-light border-dark" rows="2" v-model="presetDescription"></textarea>
+                    <textarea id="presetDescription" class="form-control" rows="2" v-model="presetDescription"></textarea>
                 </div>
 
-                <h3 class="fs-5">Tasks</h3>
+                <h3 class="h5 hotel-title">Tasks</h3>
 
                 <NewTask
                     v-for="task in taskList"
@@ -196,15 +195,14 @@
                     @remove="removeTask(task.id)"
                 />
 
-                <button type="button" class="btn btn-outline-dark rounded-pill mt-2 mb-4" @click="addTask()">
+                <button type="button" class="btn btn-outline-secondary mt-2 mb-4" @click="addTask()">
                     + Add a task
                 </button>
 
                 <div class="d-flex gap-2">
                     <button
                         type="submit"
-                        class="btn text-white fw-bold flex-grow-1"
-                        style="background-color: #83cbeb"
+                        class="btn btn-hotel flex-grow-1"
                         :disabled="isSubmitting"
                     >
                         <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
@@ -224,16 +222,16 @@
             <p class="text-muted mt-2">Loading presets...</p>
         </div>
 
-        <div v-else-if="!errorMessage && presets.length === 0 && !showForm" class="text-center py-5 border rounded bg-light">
+        <div v-else-if="!errorMessage && presets.length === 0 && !showForm" class="hotel-card text-center py-5">
             <h3 class="h5 text-muted mb-2">No presets yet</h3>
             <p class="text-muted mb-0">Create your first preset to save time when creating To Do lists.</p>
         </div>
 
         <div v-else class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
             <div v-for="preset in presets" :key="preset.preset_id" class="col">
-                <div class="card h-100 shadow-sm border-dark-subtle">
+                <div class="card hotel-card h-100">
                     <div class="card-body d-flex flex-column">
-                        <h4 class="card-title">{{ preset.preset_title }}</h4>
+                        <h4 class="card-title hotel-title">{{ preset.preset_title }}</h4>
                         <p v-if="preset.preset_description" class="card-text text-muted mb-2">{{ preset.preset_description }}</p>
 
                         <div class="small fw-bold text-muted mb-2">Tasks:</div>
@@ -250,7 +248,7 @@
                         </ul>
 
                         <div class="d-flex gap-2 mt-auto">
-                            <button type="button" class="btn btn-outline-dark btn-sm" @click="openEdit(preset)">Edit</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @click="openEdit(preset)">Edit</button>
                             <button type="button" class="btn btn-outline-danger btn-sm" @click="deletePreset(preset)">Delete</button>
                         </div>
                     </div>
