@@ -1,7 +1,9 @@
 const db = require('../models');
 const User = db.users;
 
-// Récupérer tous les utilisateurs (sans l'email ni le mot de passe) pour pouvoir les assigner à une To-Do
+const DEFAULT_ROLES = ['Receptionist', 'Housekeeping', 'Restaurant', 'Maintenance'];
+
+// Récupérer tous les utilisateurs (sans l'email ni le mot de passe)
 exports.findAll = (req, res) => {
     User.findAll({
         attributes: ['user_id', 'user_firstname', 'user_lastname', 'role'],
@@ -15,6 +17,25 @@ exports.findAll = (req, res) => {
             message: err.message || 'Error while retrieving the users.'
         });
     });
+};
+
+// Récupérer la liste des rôles assignables à une To-Do ou à un Preset
+exports.findAllRoles = async (req, res) => {
+    try {
+        const users = await User.findAll({
+            attributes: ['role'],
+            group: ['role']
+        });
+        const dbRoles = users
+            .map(u => u.role)
+            .filter(r => r && r !== 'Manager' && r !== 'Staff');
+        const roles = [...new Set([...DEFAULT_ROLES, ...dbRoles])];
+        res.send(roles);
+    } catch (err) {
+        res.status(500).send({
+            message: err.message || 'Error while retrieving the roles.'
+        });
+    }
 };
 
 // Récupérer un utilisateur par son id (pour la page Profile)

@@ -1,5 +1,6 @@
 const db = require('../models');
 const Task = db.tasks;
+const UserToDo = db.user_todos;
 
 // Récupérer toutes les tâches (optionnellement filtrées par to_do_id)
 exports.findAll = (req, res) => {
@@ -35,6 +36,11 @@ exports.findOne = (req, res) => {
 
 // Ajouter une tâche à une To-Do List existante
 exports.create = (req, res) => {
+    if (req.user.role !== 'Manager' && req.user.role !== 'Receptionist') {
+        res.status(403).send({ message: 'You do not have permission to add a task.' });
+        return;
+    }
+
     if (!req.body.task_title || !req.body.to_do_id) {
         res.status(400).send({ message: 'The title and the To Do ID are required.' });
         return;
@@ -52,22 +58,34 @@ exports.create = (req, res) => {
 };
 
 // Mettre à jour une tâche (ex: task_done passe de false à true)
-exports.update = (req, res) => {
+// Il faut avoir rejoint la To-Do pour pouvoir cocher/décocher une tâche.
+exports.update = async (req, res) => {
     const id = req.params.id;
 
-    Task.update(req.body, {
-        where: { task_id: id }
-    })
-    .then(num => {
-        if (num == 1) {
-            res.send({ message: 'Task updated successfully.' });
-        } else {
-            res.send({ message: 'Unable to find the specified task.' });
+    try {
+        const task = await Task.findByPk(id);
+        if (!task) {
+            return res.status(404).send({ message: 'Unable to find the specified task.' });
         }
-    })
-    .catch(err => {
+
+        const membership = await UserToDo.findOne({
+            where: {
+                user_id: req.user.id,
+                to_do_id: task.to_do_id
+            }
+        });
+
+        if (!membership) {
+            return res.status(403).send({
+                message: 'You must join this To Do list before checking or unchecking tasks.'
+            });
+        }
+
+        await task.update({ task_done: Boolean(req.body.task_done) });
+        res.send({ message: 'Task updated successfully.' });
+    } catch (err) {
         res.status(500).send({
             message: err.message || 'Error while updating the task.'
         });
-    });
+    }
 };

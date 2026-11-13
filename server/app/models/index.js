@@ -17,8 +17,10 @@ db.users = require('./user.model.js')(connex, Sequelize);
 db.todos = require('./todo.model.js')(connex, Sequelize);
 db.tasks = require('./task.model.js')(connex, Sequelize);
 db.user_todos = require('./user_todo.model.js')(connex, Sequelize);
+db.todo_roles = require('./todo_role.model.js')(connex, Sequelize);
 db.presets = require('./preset.model.js')(connex, Sequelize);
 db.preset_tasks = require('./preset_task.model.js')(connex, Sequelize);
+db.preset_roles = require('./preset_role.model.js')(connex, Sequelize);
 
 // Définition des relations (Jointures)
 
@@ -30,25 +32,33 @@ db.todos.belongsTo(db.users, { foreignKey: 'user_id', as: 'owner' });
 db.todos.hasMany(db.tasks, { foreignKey: 'to_do_id', as: 'tasks' });
 db.tasks.belongsTo(db.todos, { foreignKey: 'to_do_id', as: 'todo' });
 
-// 3. Plusieurs utilisateurs peuvent être assignés à plusieurs To-Do (N:N)
-db.users.belongsToMany(db.todos, { 
-    through: db.user_todos, 
-    foreignKey: 'user_id', 
-    otherKey: 'to_do_id', 
-    as: 'assignedTodos' 
+// 3. Plusieurs utilisateurs peuvent rejoindre plusieurs To-Do (N:N)
+db.users.belongsToMany(db.todos, {
+    through: db.user_todos,
+    foreignKey: 'user_id',
+    otherKey: 'to_do_id',
+    as: 'assignedTodos'
 });
-db.todos.belongsToMany(db.users, { 
-    through: db.user_todos, 
-    foreignKey: 'to_do_id', 
-    otherKey: 'user_id', 
+db.todos.belongsToMany(db.users, {
+    through: db.user_todos,
+    foreignKey: 'to_do_id',
+    otherKey: 'user_id',
     as: 'assignedUsers'
 });
 
-// 4. Un preset (modèle de To-Do) contient plusieurs tâches modèles (1:N)
+// 4. Une To-Do est assignée à 0 ou plusieurs rôles (1:N)
+db.todos.hasMany(db.todo_roles, { foreignKey: 'to_do_id', as: 'assignedRoles', onDelete: 'CASCADE' });
+db.todo_roles.belongsTo(db.todos, { foreignKey: 'to_do_id', as: 'todo' });
+
+// 5. Un preset (modèle de To-Do) contient plusieurs tâches modèles (1:N)
 db.presets.hasMany(db.preset_tasks, { foreignKey: 'preset_id', as: 'tasks', onDelete: 'CASCADE' });
 db.preset_tasks.belongsTo(db.presets, { foreignKey: 'preset_id', as: 'preset' });
 
-// 5. Un utilisateur est le créateur de plusieurs presets (1:N)
+// 6. Un preset est assigné à 0 ou plusieurs rôles (1:N)
+db.presets.hasMany(db.preset_roles, { foreignKey: 'preset_id', as: 'assignedRoles', onDelete: 'CASCADE' });
+db.preset_roles.belongsTo(db.presets, { foreignKey: 'preset_id', as: 'preset' });
+
+// 7. Un utilisateur est le créateur de plusieurs presets (1:N)
 db.users.hasMany(db.presets, { foreignKey: 'user_id', as: 'createdPresets' });
 db.presets.belongsTo(db.users, { foreignKey: 'user_id', as: 'owner' });
 

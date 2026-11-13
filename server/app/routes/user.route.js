@@ -6,6 +6,7 @@ module.exports = app => {
     router.use(verifyToken);
 
     router.get('/', user.findAll);
+    router.get('/roles', user.findAllRoles);
     router.get('/:id', user.findOne);
 
     app.use('/api/user', router);

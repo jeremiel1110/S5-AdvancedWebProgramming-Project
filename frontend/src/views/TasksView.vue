@@ -1,11 +1,24 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { apiFetch } from '../stores/auth.js'
+import { ref, computed, onMounted } from 'vue'
+import { auth, apiFetch } from '../stores/auth.js'
 import ToDoListCard from '../components/ToDoListCard.vue'
 
 const todos = ref([])
 const isLoading = ref(true)
 const errorMessage = ref('')
+
+const canCreateTodo = computed(() =>
+    auth.user?.role === 'Manager' || auth.user?.role === 'Receptionist'
+)
+
+const visibleTodos = computed(() => {
+    const role = auth.user?.role
+    if (!role) return []
+    if (role === 'Manager') return todos.value
+    return todos.value.filter(todo =>
+        (todo.assignedRoles || []).some(r => (r.role || r) === role)
+    )
+})
 
 async function fetchTodos() {
     isLoading.value = true
@@ -55,7 +68,7 @@ onMounted(() => {
           Refresh
         </button>
 
-        <RouterLink to="/newtodolist" class="btn btn-hotel">
+        <RouterLink v-if="canCreateTodo" to="/newtodolist" class="btn btn-hotel">
           + New list
         </RouterLink>
       </div>
@@ -78,20 +91,23 @@ onMounted(() => {
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="todos.length === 0" class="text-center py-5 border rounded bg-light">
+    <div v-else-if="visibleTodos.length === 0" class="text-center py-5 border rounded bg-light">
       <h3 class="h5 text-muted mb-2">No tasks yet</h3>
-      <p class="text-muted mb-0">Create your first To Do list with tasks to get started.</p>
+      <p class="text-muted mb-0">
+        {{ canCreateTodo ? 'Create your first To Do list with tasks to get started.' : 'No To Do lists are assigned to your role yet.' }}
+      </p>
     </div>
 
     <!-- Cards Grid -->
     <div v-else class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-      <div v-for="todo in todos" :key="todo.to_do_id" class="col">
+      <div v-for="todo in visibleTodos" :key="todo.to_do_id" class="col">
         <ToDoListCard
           :todoId="todo.to_do_id"
           :taskName="todo.to_do_title"
           :taskDescription="todo.to_do_description"
           :roomLocation="todo.to_do_location"
-          :assignPeople="todo.assignedUsers || []"
+          :assignRoles="todo.assignedRoles || []"
+          :joinedUsers="todo.assignedUsers || []"
           :tasks="todo.tasks || []"
           @task-updated="fetchTodos"
         />

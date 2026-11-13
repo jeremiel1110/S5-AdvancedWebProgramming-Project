@@ -7,7 +7,7 @@
                 <h2 class="h5 hotel-title mb-3">What is Hotel To-Do List?</h2>
                 <p class="mb-0">
                     Hotel To-Do List is a web application to organize the daily work of a hotel.
-                    <br>A manager creates to-do lists, assigns them to staff members, and everyone can follow what has been done and what is still left to do.
+                    <br>Managers and receptionists create to-do lists and assign them to hotel roles (such as Housekeeping, Restaurant, Maintenance, or Receptionist), so every member of a role can follow what has been done and what is still left to do.
                 </p>
             </div>
         </section>
@@ -17,7 +17,7 @@
                 <h2 class="h5 hotel-title mb-3">How it works</h2>
                 <ul class="mb-0">
                     <li>
-                        <strong>To Do List:</strong> a group of tasks linked to a place of the hotel (for example a room), with a name, a description and the people in charge of it.
+                        <strong>To Do List:</strong> a group of tasks linked to a place of the hotel (for example a room), with a name, a description and the role(s) in charge of it.
                     </li>
                     <li>
                         <strong>Task:</strong> a single thing to do inside a To Do List, with a title, a description, and a done / not done status.
@@ -34,9 +34,9 @@
                 <h2 class="h5 hotel-title mb-3">The pages</h2>
                 <ul class="mb-0">
                     <li><strong>Profile:</strong> your personal information and your session.</li>
-                    <li><strong>Tasks:</strong> the To Do Lists you are assigned to, and their tasks.</li>
-                    <li><strong>New To Do List:</strong> create a To Do List, assign people and add tasks.</li>
-                    <li><strong>Presets:</strong> ready-made To Do Lists to save time when creating one.</li>
+                    <li><strong>Tasks:</strong> the To Do Lists assigned to your role (or all To Do Lists for Managers), and their tasks.</li>
+                    <li><strong>New To Do List:</strong> create a To Do List, assign role(s) and add tasks (available to Managers and Receptionists).</li>
+                    <li><strong>Presets:</strong> ready-made To Do Lists with pre-assigned role(s) to save time when creating one (available to Managers).</li>
                     <li><strong>Information:</strong> this page.</li>
                 </ul>
             </div>

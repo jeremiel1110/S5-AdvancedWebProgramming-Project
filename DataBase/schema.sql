@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS task (
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- 5. Table d'association User <-> To-Do
+-- 5. Table d'association User <-> To-Do (membres ayant rejoint une To-Do)
 CREATE TABLE IF NOT EXISTS user_to_do (
     user_id INT NOT NULL,
     to_do_id INT NOT NULL,
@@ -53,7 +53,17 @@ CREATE TABLE IF NOT EXISTS user_to_do (
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- 6. Table des presets (modèles de To-Do réutilisables)
+-- 6. Table d'association To-Do <-> Rôle (0..N rôles par To-Do)
+CREATE TABLE IF NOT EXISTS to_do_role (
+    to_do_id INT NOT NULL,
+    role VARCHAR(100) NOT NULL,
+    PRIMARY KEY (to_do_id, role),
+    CONSTRAINT fk_tdr_todo
+        FOREIGN KEY (to_do_id) REFERENCES to_do(to_do_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- 7. Table des presets (modèles de To-Do réutilisables)
 CREATE TABLE IF NOT EXISTS preset (
     preset_id INT AUTO_INCREMENT,
     preset_title VARCHAR(255) NOT NULL,
@@ -66,7 +76,7 @@ CREATE TABLE IF NOT EXISTS preset (
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- 7. Table des tâches modèles d'un preset
+-- 8. Table des tâches modèles d'un preset
 CREATE TABLE IF NOT EXISTS preset_task (
     preset_task_id INT AUTO_INCREMENT,
     preset_task_title VARCHAR(255) NOT NULL,
@@ -74,6 +84,16 @@ CREATE TABLE IF NOT EXISTS preset_task (
     preset_id INT NOT NULL,
     PRIMARY KEY (preset_task_id),
     CONSTRAINT fk_preset_task_preset
+        FOREIGN KEY (preset_id) REFERENCES preset(preset_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- 9. Table d'association Preset <-> Rôle (0..N rôles par Preset)
+CREATE TABLE IF NOT EXISTS preset_role (
+    preset_id INT NOT NULL,
+    role VARCHAR(100) NOT NULL,
+    PRIMARY KEY (preset_id, role),
+    CONSTRAINT fk_pr_preset
         FOREIGN KEY (preset_id) REFERENCES preset(preset_id)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;

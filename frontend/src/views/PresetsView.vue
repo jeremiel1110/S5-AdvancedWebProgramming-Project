@@ -1,11 +1,15 @@
 <script setup>
-    import { ref, onMounted } from 'vue'
-    import { apiFetch } from '../stores/auth.js'
+    import { ref, computed, onMounted } from 'vue'
+    import { auth, apiFetch } from '../stores/auth.js'
     import NewTask from '../components/NewTask.vue'
 
     const presets = ref([])
     const isLoading = ref(true)
     const errorMessage = ref('')
+
+    const roles = ref(['Receptionist', 'Housekeeping', 'Restaurant', 'Maintenance'])
+    const selectedRole = ref('')
+    const assignedRoles = ref([])
 
     const showForm = ref(false)
     const editingId = ref(null)
@@ -15,7 +19,28 @@
     const formError = ref('')
     const isSubmitting = ref(false)
 
+    const isManager = computed(() => auth.user?.role === 'Manager')
+
+    const availableRoles = computed(() =>
+        roles.value.filter(role => !assignedRoles.value.includes(role))
+    )
+
     let nextTaskId = 0
+
+    async function fetchRoles() {
+        try {
+            const response = await apiFetch('http://localhost:8080/api/user/roles')
+            if (!response.ok) {
+                throw new Error(`Server error (${response.status})`)
+            }
+            const data = await response.json()
+            if (Array.isArray(data) && data.length > 0) {
+                roles.value = data
+            }
+        } catch (err) {
+            console.error('Failed to fetch roles:', err)
+        }
+    }
 
     async function fetchPresets() {
         isLoading.value = true
@@ -34,6 +59,17 @@
         }
     }
 
+    function addRole() {
+        if (selectedRole.value && !assignedRoles.value.includes(selectedRole.value)) {
+            assignedRoles.value.push(selectedRole.value)
+            selectedRole.value = ''
+        }
+    }
+
+    function removeRole(role) {
+        assignedRoles.value = assignedRoles.value.filter(r => r !== role)
+    }
+
     function addTask(title = '', description = '') {
         taskList.value.push({
             id: nextTaskId++,
@@ -50,6 +86,8 @@
         editingId.value = null
         presetName.value = ''
         presetDescription.value = ''
+        assignedRoles.value = []
+        selectedRole.value = ''
         taskList.value = []
         formError.value = ''
         showForm.value = true
@@ -59,6 +97,8 @@
         editingId.value = preset.preset_id
         presetName.value = preset.preset_title
         presetDescription.value = preset.preset_description || ''
+        assignedRoles.value = (preset.assignedRoles || []).map(r => r.role || r)
+        selectedRole.value = ''
         taskList.value = []
         for (const task of preset.tasks || []) {
             addTask(task.preset_task_title, task.preset_task_description || '')
@@ -84,6 +124,7 @@
         const payload = {
             preset_title: presetName.value.trim(),
             preset_description: presetDescription.value.trim(),
+            assignedRoles: assignedRoles.value,
             tasks: taskList.value
                 .filter(t => t.title.trim() !== '')
                 .map(t => ({
@@ -142,6 +183,7 @@
     }
 
     onMounted(() => {
+        fetchRoles()
         fetchPresets()
     })
 </script>
@@ -150,10 +192,10 @@
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
             <div>
                 <h1 class="h2 hotel-title mb-1">Presets</h1>
-                <p class="text-muted mb-0">Ready-made To Do lists: a name, a description and a list of tasks.</p>
+                <p class="text-muted mb-0">Ready-made To Do lists: a name, a description, assigned roles and a list of tasks.</p>
             </div>
             <button
-                v-if="!showForm"
+                v-if="isManager && !showForm"
                 type="button"
                 class="btn btn-hotel"
                 @click="openCreate"
@@ -166,7 +208,7 @@
             {{ errorMessage }}
         </div>
 
-        <form v-if="showForm" class="card hotel-card hotel-form col-lg-8 col-xl-6 mb-4" @submit.prevent="savePreset">
+        <form v-if="isManager && showForm" class="card hotel-card hotel-form col-lg-8 col-xl-6 mb-4" @submit.prevent="savePreset">
             <div class="card-body">
                 <h2 class="h4 hotel-title mb-3">{{ editingId !== null ? 'Edit the preset' : 'New preset' }}</h2>
 
@@ -182,6 +224,43 @@
                 <div class="mb-3">
                     <label for="presetDescription" class="form-label fw-bold">Description</label>
                     <textarea id="presetDescription" class="form-control" rows="2" v-model="presetDescription"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="presetRoleName" class="form-label fw-bold">Assign Role(s)</label>
+                    <div class="input-group">
+                        <select id="presetRoleName" class="form-select" v-model="selectedRole">
+                            <option value="" disabled>Select a role</option>
+                            <option v-for="role in availableRoles" :key="role" :value="role">
+                                {{ role }}
+                            </option>
+                        </select>
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            :disabled="selectedRole === ''"
+                            @click="addRole"
+                        >
+                            Add role
+                        </button>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        <span
+                            v-for="role in assignedRoles"
+                            :key="role"
+                            class="badge hotel-badge d-inline-flex align-items-center gap-1"
+                        >
+                            {{ role }}
+                            <button
+                                type="button"
+                                class="btn-close ms-1"
+                                style="font-size: 0.6rem"
+                                :aria-label="`Remove ${role}`"
+                                @click="removeRole(role)"
+                            ></button>
+                        </span>
+                    </div>
                 </div>
 
                 <h3 class="h5 hotel-title">Tasks</h3>
@@ -234,6 +313,22 @@
                         <h4 class="card-title hotel-title">{{ preset.preset_title }}</h4>
                         <p v-if="preset.preset_description" class="card-text text-muted mb-2">{{ preset.preset_description }}</p>
 
+                        <div class="mb-2">
+                            <div class="small fw-bold text-muted mb-1">Assigned roles:</div>
+                            <div v-if="!preset.assignedRoles || preset.assignedRoles.length === 0" class="small text-muted fst-italic">
+                                No roles assigned.
+                            </div>
+                            <div v-else class="d-flex flex-wrap gap-1">
+                                <span
+                                    v-for="roleItem in preset.assignedRoles"
+                                    :key="roleItem.role || roleItem"
+                                    class="badge text-bg-light border"
+                                >
+                                    {{ roleItem.role || roleItem }}
+                                </span>
+                            </div>
+                        </div>
+
                         <div class="small fw-bold text-muted mb-2">Tasks:</div>
                         <div v-if="!preset.tasks || preset.tasks.length === 0" class="small text-muted fst-italic mb-2">
                             No tasks yet.
@@ -247,7 +342,7 @@
                             </li>
                         </ul>
 
-                        <div class="d-flex gap-2 mt-auto">
+                        <div v-if="isManager" class="d-flex gap-2 mt-auto">
                             <button type="button" class="btn btn-outline-secondary btn-sm" @click="openEdit(preset)">Edit</button>
                             <button type="button" class="btn btn-outline-danger btn-sm" @click="deletePreset(preset)">Delete</button>
                         </div>

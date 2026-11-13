@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from 'vue'
-import { apiFetch } from '../stores/auth.js'
+import { ref, computed } from 'vue'
+import { auth, apiFetch } from '../stores/auth.js'
 
 const emit = defineEmits(['close', 'task-updated'])
 
@@ -9,7 +9,11 @@ const props = defineProps({
     taskName: String,
     taskDescription: String,
     roomLocation: String,
-    assignPeople: {
+    assignRoles: {
+        type: Array,
+        default: () => []
+    },
+    joinedUsers: {
         type: Array,
         default: () => []
     },
@@ -20,8 +24,42 @@ const props = defineProps({
 })
 
 const newTaskTitle = ref('')
+const isJoiningOrLeaving = ref(false)
 
-async function toggleTask(task) {
+const currentUserId = computed(() => auth.user?.id || auth.user?.user_id)
+const hasJoined = computed(() =>
+    (props.joinedUsers || []).some(u => Number(u.user_id || u.id) === Number(currentUserId.value))
+)
+
+const canCreateTask = computed(() =>
+    auth.user?.role === 'Manager' || auth.user?.role === 'Receptionist'
+)
+
+async function toggleJoin() {
+    if (!props.todoId || isJoiningOrLeaving.value) return
+    isJoiningOrLeaving.value = true
+    const action = hasJoined.value ? 'leave' : 'join'
+    try {
+        const response = await apiFetch(`http://localhost:8080/api/todo/${props.todoId}/${action}`, {
+            method: 'POST'
+        })
+        if (!response.ok) throw new Error(`Server error (${response.status})`)
+        emit('task-updated')
+    } catch (e) {
+        console.error(`Failed to ${action} todo:`, e)
+    } finally {
+        isJoiningOrLeaving.value = false
+    }
+}
+
+async function toggleTask(task, event) {
+    if (!hasJoined.value) {
+        if (event?.target) {
+            event.target.checked = Boolean(task.task_done || task.completed)
+        }
+        return
+    }
+
     const currentStatus = !!(task.task_done || task.completed)
     const newStatus = !currentStatus
     task.task_done = newStatus
@@ -35,7 +73,11 @@ async function toggleTask(task) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ task_done: newStatus })
             })
-            if (!response.ok) throw new Error(`Server error (${response.status})`)
+            if (!response.ok) {
+                task.task_done = currentStatus
+                task.completed = currentStatus
+                throw new Error(`Server error (${response.status})`)
+            }
             emit('task-updated')
         } catch (e) {
             console.error('Failed to update task:', e)
@@ -84,16 +126,47 @@ async function addNewTask() {
             </div>
             
             <div class="card-body">
-                <div v-if="assignPeople && assignPeople.length > 0" class="mb-3">
-                    <h6>Assigned people:</h6>
-                    <div class="d-flex flex-wrap gap-2">
-                        <span v-for="person in assignPeople" :key="person.user_id || person.id || person" class="badge bg-secondary">
-                            {{ person.user_firstname ? `${person.user_firstname} ${person.user_lastname}` : (person.name || person) }}
+                <div class="mb-3">
+                    <h6>Assigned role(s):</h6>
+                    <div v-if="!assignRoles || assignRoles.length === 0" class="text-muted small fst-italic">
+                        No role assigned.
+                    </div>
+                    <div v-else class="d-flex flex-wrap gap-2">
+                        <span v-for="roleItem in assignRoles" :key="roleItem.role || roleItem" class="badge hotel-badge">
+                            {{ roleItem.role || roleItem }}
                         </span>
                     </div>
                 </div>
 
-                <h6>Tasks:</h6>
+                <div class="mb-3 d-flex flex-wrap justify-content-between align-items-center gap-2 border rounded-2 p-3 bg-light">
+                    <div>
+                        <h6 class="mb-1">Joined by:</h6>
+                        <div v-if="!joinedUsers || joinedUsers.length === 0" class="text-muted small fst-italic">
+                            No member has joined this To-Do yet.
+                        </div>
+                        <div v-else class="d-flex flex-wrap gap-2">
+                            <span v-for="person in joinedUsers" :key="person.user_id || person.id" class="badge bg-secondary">
+                                {{ person.user_firstname }} {{ person.user_lastname }} ({{ person.role }})
+                            </span>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        class="btn btn-sm"
+                        :class="hasJoined ? 'btn-outline-danger' : 'btn-hotel'"
+                        :disabled="isJoiningOrLeaving"
+                        @click="toggleJoin"
+                    >
+                        {{ hasJoined ? 'Leave To-Do' : 'Join To-Do' }}
+                    </button>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0">Tasks:</h6>
+                    <span v-if="!hasJoined && tasks && tasks.length > 0" class="small text-muted fst-italic">
+                        You must join this To-Do to check tasks.
+                    </span>
+                </div>
                 <div v-if="!tasks || tasks.length === 0" class="text-muted mb-3">
                     No tasks in this list yet.
                 </div>
@@ -105,7 +178,8 @@ async function addNewTask() {
                                 type="checkbox" 
                                 :id="'task-' + (task.task_id || task.id)" 
                                 :checked="task.task_done || task.completed"
-                                @change="toggleTask(task)"
+                                :disabled="!hasJoined"
+                                @change="toggleTask(task, $event)"
                             >
                             <label 
                                 class="form-check-label mb-0" 
@@ -124,7 +198,7 @@ async function addNewTask() {
                     </li>
                 </ul>
 
-                <div v-if="todoId" class="mt-3 pt-2 border-top">
+                <div v-if="todoId && canCreateTask" class="mt-3 pt-2 border-top">
                     <label class="form-label fw-bold small">Add a task to this list</label>
                     <div class="input-group">
                         <input 

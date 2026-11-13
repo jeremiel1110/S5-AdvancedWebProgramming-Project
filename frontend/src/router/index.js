@@ -42,6 +42,16 @@ router.beforeEach(async (to) => {
   if (to.path === "/login" && auth.user) {
     return "/tasks";
   }
+  if (to.path === "/presets" && auth.user?.role !== "Manager") {
+    return "/tasks";
+  }
+  if (
+    to.path === "/newtodolist" &&
+    auth.user?.role !== "Manager" &&
+    auth.user?.role !== "Receptionist"
+  ) {
+    return "/tasks";
+  }
 });
 
 watch(() => auth.user, (user) => {

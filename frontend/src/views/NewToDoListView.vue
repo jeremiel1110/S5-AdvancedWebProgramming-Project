@@ -1,7 +1,7 @@
 <script setup>
     import { ref, computed, onMounted } from 'vue'
     import { useRouter } from 'vue-router'
-    import { apiFetch } from '../stores/auth.js'
+    import { auth, apiFetch } from '../stores/auth.js'
     import NewTask from '../components/NewTask.vue'
 
     const router = useRouter()
@@ -10,29 +10,33 @@
     const description = ref('')
     const presets = ref([])
     const selectedPresetId = ref('')
-    const users = ref([])
-    const selectedUserId = ref('')
-    const assignedUsers = ref([])
+    const roles = ref(['Receptionist', 'Housekeeping', 'Restaurant', 'Maintenance'])
+    const selectedRole = ref('')
+    const assignedRoles = ref([])
     const room = ref('')
     const taskList = ref([])
     const errorMessage = ref('')
     const isSubmitting = ref(false)
 
-    // Users that can still be assigned (the ones already added are hidden from the select)
-    const availableUsers = computed(() =>
-        users.value.filter(u => !assignedUsers.value.some(a => a.user_id === u.user_id))
+    const isManager = computed(() => auth.user?.role === 'Manager')
+
+    // Roles that can still be assigned (the ones already added are hidden from the select)
+    const availableRoles = computed(() =>
+        roles.value.filter(role => !assignedRoles.value.includes(role))
     )
 
-    async function fetchUsers() {
+    async function fetchRoles() {
         try {
-            const response = await apiFetch('http://localhost:8080/api/user')
+            const response = await apiFetch('http://localhost:8080/api/user/roles')
             if (!response.ok) {
                 throw new Error(`Server error (${response.status})`)
             }
-            users.value = await response.json()
+            const data = await response.json()
+            if (Array.isArray(data) && data.length > 0) {
+                roles.value = data
+            }
         } catch (err) {
-            console.error('Failed to fetch users:', err)
-            errorMessage.value = 'Unable to load the list of users.'
+            console.error('Failed to fetch roles:', err)
         }
     }
 
@@ -50,21 +54,19 @@
     }
 
     onMounted(() => {
-        fetchUsers()
+        fetchRoles()
         fetchPresets()
     })
 
-    function addPerson() {
-        const user = users.value.find(u => u.user_id === selectedUserId.value)
-
-        if (user) {
-            assignedUsers.value.push(user)
-            selectedUserId.value = ''
+    function addRole() {
+        if (selectedRole.value && !assignedRoles.value.includes(selectedRole.value)) {
+            assignedRoles.value.push(selectedRole.value)
+            selectedRole.value = ''
         }
     }
 
-    function removePerson(userId) {
-        assignedUsers.value = assignedUsers.value.filter(u => u.user_id !== userId)
+    function removeRole(role) {
+        assignedRoles.value = assignedRoles.value.filter(r => r !== role)
     }
 
     let nextTaskId = 0
@@ -82,21 +84,26 @@
         taskList.value = taskList.value.filter(t => t.id !== taskId)
     }
 
-    // Fill the name, the description and the tasks of the form with the ones of a preset
-    // (the room and the assigned people are specific to each list, so they are kept as they are)
+    // Fill the name, the description, the assigned roles and the tasks of the form with the ones of a preset
+    // (the room is specific to each list, so it is kept as it is)
     function applyPreset() {
         const preset = presets.value.find(p => p.preset_id === selectedPresetId.value)
         if (!preset) {
             return
         }
 
-        const formHasData = listName.value.trim() || description.value.trim() || taskList.value.length > 0
-        if (formHasData && !window.confirm('Replace the name, the description and the tasks of the form with the ones of this preset?')) {
+        const formHasData =
+            listName.value.trim() ||
+            description.value.trim() ||
+            taskList.value.length > 0 ||
+            assignedRoles.value.length > 0
+        if (formHasData && !window.confirm('Replace the name, the description, the assigned roles and the tasks of the form with the ones of this preset?')) {
             return
         }
 
         listName.value = preset.preset_title
         description.value = preset.preset_description || ''
+        assignedRoles.value = (preset.assignedRoles || []).map(r => r.role || r)
         taskList.value = (preset.tasks || []).map(task => ({
             id: nextTaskId++,
             title: task.preset_task_title,
@@ -127,7 +134,7 @@
             to_do_title: listName.value.trim(),
             to_do_location: room.value ? room.value.trim() : '',
             to_do_description: description.value.trim(),
-            assignedUserIds: assignedUsers.value.map(u => u.user_id),
+            assignedRoles: assignedRoles.value,
             tasks: validTasks
         }
 
@@ -182,7 +189,10 @@
                     </button>
                 </div>
                 <p v-else class="text-muted mb-0">
-                    No presets yet. You can create some in the <RouterLink to="/presets">Presets</RouterLink> page.
+                    No presets yet.
+                    <template v-if="isManager">
+                        You can create some in the <RouterLink to="/presets">Presets</RouterLink> page.
+                    </template>
                 </p>
             </div>
         </div>
@@ -207,39 +217,39 @@
             </section>
 
             <section class="hotel-card p-3 p-sm-4 mb-3">
-                <h2 class="h5 hotel-title mb-3">Assigned people</h2>
+                <h2 class="h5 hotel-title mb-3">Assigned roles</h2>
                 <div>
-                    <label for="personName" class="form-label fw-bold">Assign Person(s)</label>
+                    <label for="roleName" class="form-label fw-bold">Assign Role(s)</label>
                     <div class="input-group">
-                        <select id="personName" class="form-select" v-model="selectedUserId">
-                            <option value="" disabled>Select a person</option>
-                            <option v-for="user in availableUsers" :key="user.user_id" :value="user.user_id">
-                                {{ user.user_firstname }} {{ user.user_lastname }} ({{ user.role }})
+                        <select id="roleName" class="form-select" v-model="selectedRole">
+                            <option value="" disabled>Select a role</option>
+                            <option v-for="role in availableRoles" :key="role" :value="role">
+                                {{ role }}
                             </option>
                         </select>
                         <button
                             type="button"
                             class="btn btn-outline-secondary"
-                            :disabled="selectedUserId === ''"
-                            @click="addPerson"
+                            :disabled="selectedRole === ''"
+                            @click="addRole"
                         >
-                            Add person
+                            Add role
                         </button>
                     </div>
 
                     <div class="d-flex flex-wrap gap-2 mt-2">
                         <span
-                            v-for="person in assignedUsers"
-                            :key="person.user_id"
+                            v-for="role in assignedRoles"
+                            :key="role"
                             class="badge hotel-badge d-inline-flex align-items-center gap-1"
                         >
-                            {{ person.user_firstname }} {{ person.user_lastname }}
+                            {{ role }}
                             <button
                                 type="button"
                                 class="btn-close ms-1"
                                 style="font-size: 0.6rem"
-                                :aria-label="`Remove ${person.user_firstname} ${person.user_lastname}`"
-                                @click="removePerson(person.user_id)"
+                                :aria-label="`Remove ${role}`"
+                                @click="removeRole(role)"
                             ></button>
                         </span>
                     </div>

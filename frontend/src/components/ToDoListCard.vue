@@ -1,6 +1,6 @@
 <script setup>
     import { computed, ref } from 'vue'
-    import { apiFetch } from '../stores/auth.js'
+    import { auth, apiFetch } from '../stores/auth.js'
     import DetailledTaskCard from './DetailledTaskCard.vue'
 
     const emit = defineEmits(['task-updated'])
@@ -10,7 +10,11 @@
         taskName: String,
         taskDescription: String,
         roomLocation: String,
-        assignPeople: {
+        assignRoles: {
+            type: Array,
+            default: () => []
+        },
+        joinedUsers: {
             type: Array,
             default: () => []
         },
@@ -21,13 +25,43 @@
     })
 
     const showDetails = ref(false)
+    const isJoiningOrLeaving = ref(false)
+
+    const currentUserId = computed(() => auth.user?.id || auth.user?.user_id)
+    const hasJoined = computed(() =>
+        (props.joinedUsers || []).some(u => Number(u.user_id || u.id) === Number(currentUserId.value))
+    )
 
     const taskCount = computed(() => props.tasks?.length ?? 0)
     const completedCount = computed(() =>
         props.tasks?.filter(task => task.task_done || task.completed).length ?? 0
     )
 
-    async function toggleTaskDirect(task) {
+    async function toggleJoin() {
+        if (!props.todoId || isJoiningOrLeaving.value) return
+        isJoiningOrLeaving.value = true
+        const action = hasJoined.value ? 'leave' : 'join'
+        try {
+            const response = await apiFetch(`http://localhost:8080/api/todo/${props.todoId}/${action}`, {
+                method: 'POST'
+            })
+            if (!response.ok) throw new Error(`Server error (${response.status})`)
+            emit('task-updated')
+        } catch (e) {
+            console.error(`Failed to ${action} todo:`, e)
+        } finally {
+            isJoiningOrLeaving.value = false
+        }
+    }
+
+    async function toggleTaskDirect(task, event) {
+        if (!hasJoined.value) {
+            if (event?.target) {
+                event.target.checked = Boolean(task.task_done || task.completed)
+            }
+            return
+        }
+
         const currentStatus = Boolean(task.task_done || task.completed)
         const newStatus = !currentStatus
         task.task_done = newStatus
@@ -41,7 +75,11 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ task_done: newStatus })
                 })
-                if (!response.ok) throw new Error(`Server error (${response.status})`)
+                if (!response.ok) {
+                    task.task_done = currentStatus
+                    task.completed = currentStatus
+                    throw new Error(`Server error (${response.status})`)
+                }
                 emit('task-updated')
             } catch (e) {
                 console.error('Failed to update task:', e)
@@ -54,13 +92,38 @@
     <div class="card h-100 room-card">
         <div class="card-body d-flex flex-column">
             <div class="mb-2">
-                <span v-if="roomLocation" class="badge hotel-badge mb-2">
-                    Room {{ roomLocation }}
-                </span>
+                <div class="d-flex flex-wrap gap-1 mb-2">
+                    <span v-if="roomLocation" class="badge hotel-badge">
+                        Room {{ roomLocation }}
+                    </span>
+                    <span
+                        v-for="roleItem in assignRoles"
+                        :key="roleItem.role || roleItem"
+                        class="badge bg-secondary"
+                    >
+                        {{ roleItem.role || roleItem }}
+                    </span>
+                </div>
                 <h4 class="card-title hotel-title mb-0">{{ taskName }}</h4>
             </div>
 
             <p v-if="taskDescription" class="card-text text-muted mb-2">{{ taskDescription }}</p>
+
+            <div class="mb-2">
+                <div class="small fw-bold text-muted mb-1">Assigned role(s):</div>
+                <div v-if="!assignRoles || assignRoles.length === 0" class="small text-muted fst-italic">
+                    No role assigned.
+                </div>
+                <div v-else class="d-flex flex-wrap gap-1">
+                    <span 
+                        v-for="roleItem in assignRoles" 
+                        :key="roleItem.role || roleItem"
+                        class="badge hotel-badge"
+                    >
+                        {{ roleItem.role || roleItem }}
+                    </span>
+                </div>
+            </div>
 
             <div v-if="taskCount > 0" class="my-2">
                 <span class="small fw-semibold text-secondary">
@@ -76,7 +139,12 @@
 
             <!-- Tasks directly visible on the card -->
             <div class="my-2">
-                <div class="small fw-bold text-muted mb-2">Tasks:</div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small fw-bold text-muted">Tasks:</span>
+                    <span v-if="!hasJoined && tasks && tasks.length > 0" class="small text-muted fst-italic">
+                        Join to check tasks
+                    </span>
+                </div>
                 <div v-if="!tasks || tasks.length === 0" class="small text-muted fst-italic">
                     No tasks yet.
                 </div>
@@ -91,7 +159,8 @@
                             type="checkbox" 
                             :id="'card-task-' + (task.task_id || task.id)" 
                             :checked="Boolean(task.task_done || task.completed)"
-                            @change="toggleTaskDirect(task)"
+                            :disabled="!hasJoined"
+                            @change="toggleTaskDirect(task, $event)"
                         >
                         <label 
                             class="form-check-label small text-break mb-0" 
@@ -104,26 +173,40 @@
                 </ul>
             </div>
 
-            <div v-if="assignPeople && assignPeople.length > 0" class="mt-auto mb-3">
-                <div class="small fw-bold text-muted mb-1">Assigned people:</div>
-                <div class="d-flex flex-wrap gap-1">
+            <div class="mt-auto mb-3">
+                <div class="small fw-bold text-muted mb-1">Joined by:</div>
+                <div v-if="!joinedUsers || joinedUsers.length === 0" class="small text-muted fst-italic">
+                    No member has joined yet.
+                </div>
+                <div v-else class="d-flex flex-wrap gap-1">
                     <span 
-                        v-for="person in assignPeople" 
-                        :key="person.user_id || person.id || person"
+                        v-for="person in joinedUsers" 
+                        :key="person.user_id || person.id"
                         class="badge text-bg-light border"
                     >
-                        {{ person.user_firstname ? `${person.user_firstname} ${person.user_lastname}` : (person.name || person) }}
+                        {{ person.user_firstname }} {{ person.user_lastname }}
                     </span>
                 </div>
             </div>
 
-            <button
-                type="button"
-                class="btn btn-hotel mt-2"
-                @click="showDetails = true"
-            >
-                View details
-            </button>
+            <div class="d-flex gap-2 mt-2">
+                <button
+                    type="button"
+                    class="btn flex-grow-1"
+                    :class="hasJoined ? 'btn-outline-danger' : 'btn-outline-success'"
+                    :disabled="isJoiningOrLeaving"
+                    @click="toggleJoin"
+                >
+                    {{ hasJoined ? 'Leave To-Do' : 'Join To-Do' }}
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-hotel flex-grow-1"
+                    @click="showDetails = true"
+                >
+                    View details
+                </button>
+            </div>
         </div>
     </div>
 
@@ -136,7 +219,8 @@
         :taskName="taskName"
         :taskDescription="taskDescription"
         :roomLocation="roomLocation"
-        :assignPeople="assignPeople"
+        :assignRoles="assignRoles"
+        :joinedUsers="joinedUsers"
     />
 </template>
 <style scoped>

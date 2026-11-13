@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { auth } from '../stores/auth.js'
 import profileIcon from '../assets/sidebar/profile.png'
 import tasksIcon from '../assets/sidebar/tasks.png'
 import newToDoListIcon from '../assets/sidebar/newtodolist.png'
@@ -8,8 +9,12 @@ import informationIcon from '../assets/sidebar/information.png'
 
 const menuOpen = ref(false)
 
-const permissionTaskCreation = true
-const permissionPresetCreationEdition = true
+const permissionTaskCreation = computed(() =>
+  auth.user?.role === 'Manager' || auth.user?.role === 'Receptionist'
+)
+const permissionPresetCreationEdition = computed(() =>
+  auth.user?.role === 'Manager'
+)
 </script>
 
 <template>
