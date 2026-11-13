@@ -33,7 +33,7 @@ npm run dev
 ## Run the Server
 
 1. Start a MySQL server.
-2. For a new database, run `DataBase/schema.sql` then `DataBase/seed.sql`. If the database already contains the original demo users, run only `DataBase/update_password_hashes.sql` to replace their placeholder hashes; it preserves existing users, tasks and real password hashes.
+2. For a new database, run `DataBase/schema.sql` then `DataBase/seed.sql`. If the database already contains the original demo users, run only `DataBase/update_password_hashes.sql` to replace their placeholder hashes; it preserves existing users, tasks and real password hashes. To add more demo data (extra users, To Do lists with their tasks and assigned people, and presets), run `DataBase/seed_demo_data.sql` afterwards: it can be run several times and never creates duplicates.
 3. Copy `server/.env.example` to `server/.env`, then fill in your own MySQL username and password (`DB_USER` and `DB_PASSWORD`). Generate a random secret with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` and put it in `JWT_SECRET`. The `.env` file is ignored by Git: never commit it.
 4. Open a terminal and run:
 
@@ -49,6 +49,6 @@ The server listens on port 8080.
 
 Run Vue at `http://localhost:5173` and Express at `http://localhost:8080`. A successful `POST /api/auth/login` creates a signed JWT that expires after one hour. The browser keeps it in an `HttpOnly`, `SameSite=Strict` cookie, with `Secure` enabled when `NODE_ENV=production` (HTTPS required). `GET /api/auth/me` restores the session after a page reload, and `POST /api/auth/logout` clears the cookie. The user, to-do and task API routes all require a valid token.
 
-Login looks up the user by email in MySQL using Sequelize, then verifies `password_hash` with bcryptjs. The seed accounts are `manager@hotel.com` / `password123` and `alice@hotel.com` / `password456`. The API and JWT contain public user fields only, with no password or hash. Passwords are limited to 72 UTF-8 bytes to avoid bcrypt truncation. For additional users, store a hash generated with `bcrypt.hash(password, 12)` in `password_hash`; no registration form is included. Demo accounts are for local development and must be removed or have their passwords changed before deployment.
+Login looks up the user by email in MySQL using Sequelize, then verifies `password_hash` with bcryptjs. The seed accounts are `manager@hotel.com` / `password123` and `alice@hotel.com` / `password456`. `DataBase/seed_demo_data.sql` adds five more accounts, all with the password `password123`: `claire.moreau@hotel.com` (Manager), `lucas.bernard@hotel.com`, `sophie.laurent@hotel.com`, `marc.petit@hotel.com` and `emma.rousseau@hotel.com` (Staff). The API and JWT contain public user fields only, with no password or hash. Passwords are limited to 72 UTF-8 bytes to avoid bcrypt truncation. For additional users, store a hash generated with `bcrypt.hash(password, 12)` in `password_hash`; no registration form is included. Demo accounts are for local development and must be removed or have their passwords changed before deployment.
 
 All authenticated accounts currently share access to the management API. Logout removes the browser cookie; a copied token remains valid until its one-hour expiration.
