@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import eyeIcon from "../assets/eye.png";
 import { login } from "../stores/auth";
+import { DEMO_MODE } from "../config.js";
 
 const router = useRouter();
 
@@ -78,6 +79,17 @@ async function connect() {
         <div class="fw-bold hotel-title">Demo account</div>
         <div>Email: <code>manager@hotel.com</code></div>
         <div>Password: <code>password123</code></div>
+
+        <template v-if="DEMO_MODE">
+          <div class="fw-bold hotel-title mt-3">Other roles</div>
+          <div><code>alice@hotel.com</code> / <code>password456</code> (Housekeeping)</div>
+          <div><code>lucas.bernard@hotel.com</code> / <code>password123</code> (Receptionist)</div>
+          <div><code>marc.petit@hotel.com</code> / <code>password123</code> (Maintenance)</div>
+          <div><code>emma.rousseau@hotel.com</code> / <code>password123</code> (Restaurant)</div>
+          <div class="text-muted mt-3">
+            Preview mode: there is no server here. The data stays in your browser and is not shared.
+          </div>
+        </template>
       </div>
     </form>
   </div>

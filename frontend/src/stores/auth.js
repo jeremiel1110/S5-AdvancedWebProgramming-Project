@@ -11,8 +11,19 @@ export const auth = reactive({
   loaded: false,
 });
 
+// Every request of the application goes through here. In demo mode (GitHub Pages preview), it is answered
+// in the browser by a fake API (src/demo): the test below is replaced at build time, so a normal build
+// does not contain the demo code.
+async function request(url, options) {
+  if (import.meta.env.VITE_DEMO_MODE === "true") {
+    const { mockFetch } = await import("../demo/mockApi.js");
+    return mockFetch(url, options);
+  }
+  return fetch(url, options);
+}
+
 export async function login(email, password) {
-  const response = await fetch(apiUrl + "/login", {
+  const response = await request(apiUrl + "/login", {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -33,7 +44,7 @@ export async function login(email, password) {
 }
 
 export async function restoreSession() {
-  const response = await fetch(apiUrl + "/me", { credentials: "include" });
+  const response = await request(apiUrl + "/me", { credentials: "include" });
   if (response.ok) {
     const data = await response.json();
     auth.user = data.user;
@@ -44,7 +55,7 @@ export async function restoreSession() {
 }
 
 export async function logout() {
-  const response = await fetch(apiUrl + "/logout", {
+  const response = await request(apiUrl + "/logout", {
     method: "POST",
     credentials: "include",
   });
@@ -57,7 +68,7 @@ export async function logout() {
 // url is a path of the API (for example "/todo"); a full address (http...) is also accepted
 export async function apiFetch(url, options = {}) {
   const target = url.startsWith("http") ? url : API_URL + url;
-  const response = await fetch(target, { ...options, credentials: "include" });
+  const response = await request(target, { ...options, credentials: "include" });
   if (response.status === 401) {
     auth.user = null;
     throw new Error("Session expired. Please log in again.");

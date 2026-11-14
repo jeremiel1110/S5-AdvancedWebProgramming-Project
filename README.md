@@ -12,9 +12,11 @@ A course project for managing hotel tasks and assigning to-do lists to staff mem
 
 https://jeremiel1110.github.io/S5-AdvancedWebProgramming-Project/
 
-The preview is deployed automatically from `main` with GitHub Actions. GitHub Pages only serves static files: the Node.js server and MySQL database are not hosted. Login now requires the backend, so run the server and frontend locally to use the application (see below).
+The preview is deployed automatically from `main` with GitHub Actions. GitHub Pages only serves static files, so the Node.js server and the MySQL database are not hosted. The preview therefore runs in **demo mode**: a fake API (`frontend/src/demo`) answers the requests inside the browser, with the same data as the seed scripts and the same rules for the roles. The data is kept in the browser tab (it is shared with nobody, and the "Reset demo data" button restores the starting data). The real application, with the server and the database, runs locally (see below).
 
-Demo login: `manager@hotel.com` / `password123`.
+Demo logins: `manager@hotel.com` / `password123` (Manager), `lucas.bernard@hotel.com` / `password123` (Receptionist), `alice@hotel.com` / `password456` (Housekeeping), `marc.petit@hotel.com` / `password123` (Maintenance) and `emma.rousseau@hotel.com` / `password123` (Restaurant).
+
+To try the demo mode locally, set `VITE_DEMO_MODE=true` in `frontend/.env` (see `frontend/.env.example`).
 
 ## Project milestones
 

@@ -30,9 +30,13 @@ jobs:
         run: npm ci
         working-directory: frontend
 
+      # The Express server and MySQL are not hosted on GitHub Pages: the preview uses the demo mode,
+      # where a fake API answers in the browser (see frontend/src/demo).
       - name: Build
         run: npm run build
         working-directory: frontend
+        env:
+          VITE_DEMO_MODE: "true"
 
       # GitHub Pages has no server-side routing: a direct visit to /tasks would be a 404.
       # Serving index.html as 404.html lets Vue Router handle the URL.
