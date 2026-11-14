@@ -29,7 +29,7 @@
 
     async function fetchRoles() {
         try {
-            const response = await apiFetch('http://localhost:8080/api/user/roles')
+            const response = await apiFetch('/user/roles')
             if (!response.ok) {
                 throw new Error(`Server error (${response.status})`)
             }
@@ -46,7 +46,7 @@
         isLoading.value = true
         errorMessage.value = ''
         try {
-            const response = await apiFetch('http://localhost:8080/api/preset')
+            const response = await apiFetch('/preset')
             if (!response.ok) {
                 throw new Error(`Server error (${response.status})`)
             }
@@ -135,8 +135,8 @@
 
         const isEdit = editingId.value !== null
         const url = isEdit
-            ? `http://localhost:8080/api/preset/${editingId.value}`
-            : 'http://localhost:8080/api/preset'
+            ? `/preset/${editingId.value}`
+            : '/preset'
 
         try {
             const response = await apiFetch(url, {
@@ -166,7 +166,7 @@
         }
 
         try {
-            const response = await apiFetch(`http://localhost:8080/api/preset/${preset.preset_id}`, {
+            const response = await apiFetch(`/preset/${preset.preset_id}`, {
                 method: 'DELETE'
             })
             if (!response.ok) {

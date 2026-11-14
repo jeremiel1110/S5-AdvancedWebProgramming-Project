@@ -21,7 +21,7 @@
         errorMessage.value = ''
 
         try {
-            const response = await apiFetch(`http://localhost:8080/api/user/${userId}`)
+            const response = await apiFetch(`/user/${userId}`)
             if (!response.ok) {
                 throw new Error(`Server error (${response.status})`)
             }

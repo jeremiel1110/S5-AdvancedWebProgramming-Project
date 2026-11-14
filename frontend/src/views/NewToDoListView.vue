@@ -27,7 +27,7 @@
 
     async function fetchRoles() {
         try {
-            const response = await apiFetch('http://localhost:8080/api/user/roles')
+            const response = await apiFetch('/user/roles')
             if (!response.ok) {
                 throw new Error(`Server error (${response.status})`)
             }
@@ -42,7 +42,7 @@
 
     async function fetchPresets() {
         try {
-            const response = await apiFetch('http://localhost:8080/api/preset')
+            const response = await apiFetch('/preset')
             if (!response.ok) {
                 throw new Error(`Server error (${response.status})`)
             }
@@ -139,7 +139,7 @@
         }
 
         try {
-            const response = await apiFetch('http://localhost:8080/api/todo', {
+            const response = await apiFetch('/todo', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

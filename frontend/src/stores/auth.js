@@ -1,6 +1,7 @@
 import { reactive } from "vue";
+import { API_URL } from "../config.js";
 
-const apiUrl = "http://localhost:8080/api/auth";
+const apiUrl = API_URL + "/auth";
 
 localStorage.removeItem("user");
 localStorage.removeItem("token");
@@ -53,8 +54,10 @@ export async function logout() {
   auth.user = null;
 }
 
+// url is a path of the API (for example "/todo"); a full address (http...) is also accepted
 export async function apiFetch(url, options = {}) {
-  const response = await fetch(url, { ...options, credentials: "include" });
+  const target = url.startsWith("http") ? url : API_URL + url;
+  const response = await fetch(target, { ...options, credentials: "include" });
   if (response.status === 401) {
     auth.user = null;
     throw new Error("Session expired. Please log in again.");

@@ -30,6 +30,8 @@ npm install
 npm run dev
 ```
 
+The frontend calls the API at `http://localhost:8080/api`. If your server runs elsewhere, copy `frontend/.env.example` to `frontend/.env` and change `VITE_API_URL` (the `.env` file is ignored by Git). The address is defined in one place, `frontend/src/config.js`.
+
 ## Run the Server
 
 1. Start a MySQL server.

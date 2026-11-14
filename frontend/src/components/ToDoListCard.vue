@@ -42,7 +42,7 @@
         isJoiningOrLeaving.value = true
         const action = hasJoined.value ? 'leave' : 'join'
         try {
-            const response = await apiFetch(`http://localhost:8080/api/todo/${props.todoId}/${action}`, {
+            const response = await apiFetch(`/todo/${props.todoId}/${action}`, {
                 method: 'POST'
             })
             if (!response.ok) throw new Error(`Server error (${response.status})`)
@@ -70,7 +70,7 @@
         const taskId = task.task_id || task.id
         if (taskId) {
             try {
-                const response = await apiFetch(`http://localhost:8080/api/task/${taskId}`, {
+                const response = await apiFetch(`/task/${taskId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ task_done: newStatus })
