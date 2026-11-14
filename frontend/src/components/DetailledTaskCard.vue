@@ -25,6 +25,8 @@ const props = defineProps({
 
 const newTaskTitle = ref('')
 const isJoiningOrLeaving = ref(false)
+const isDeleting = ref(false)
+const deleteError = ref('')
 
 const currentUserId = computed(() => auth.user?.id || auth.user?.user_id)
 const hasJoined = computed(() =>
@@ -32,6 +34,11 @@ const hasJoined = computed(() =>
 )
 
 const canCreateTask = computed(() =>
+    auth.user?.role === 'Manager' || auth.user?.role === 'Receptionist'
+)
+
+// Same rule as the server: only a Manager or a Receptionist can delete a To Do list
+const canDeleteTodo = computed(() =>
     auth.user?.role === 'Manager' || auth.user?.role === 'Receptionist'
 )
 
@@ -49,6 +56,30 @@ async function toggleJoin() {
         console.error(`Failed to ${action} todo:`, e)
     } finally {
         isJoiningOrLeaving.value = false
+    }
+}
+
+async function deleteTodo() {
+    if (!props.todoId || isDeleting.value) return
+    if (!window.confirm(`Delete the To Do list "${props.taskName}" and all its tasks? This cannot be undone.`)) return
+
+    isDeleting.value = true
+    deleteError.value = ''
+    try {
+        const response = await apiFetch(`/todo/${props.todoId}`, {
+            method: 'DELETE'
+        })
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}))
+            throw new Error(errData.message || `Server error (${response.status})`)
+        }
+        emit('task-updated')
+        emit('close')
+    } catch (e) {
+        console.error('Failed to delete todo:', e)
+        deleteError.value = e.message || 'Unable to delete the To Do list.'
+    } finally {
+        isDeleting.value = false
     }
 }
 
@@ -212,6 +243,16 @@ async function addNewTask() {
                             Add
                         </button>
                     </div>
+                </div>
+
+                <div v-if="todoId && canDeleteTodo" class="mt-4 pt-3 border-top">
+                    <div v-if="deleteError" class="alert alert-danger py-2" role="alert">
+                        {{ deleteError }}
+                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm" :disabled="isDeleting" @click="deleteTodo">
+                        <span v-if="isDeleting" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                        Delete this To-Do
+                    </button>
                 </div>
             </div>
         </div>
